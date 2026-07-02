@@ -1,0 +1,13 @@
+# Dependencias
+node_modules/
+
+# Variaveis de ambiente / segredos
+.env
+.env.local
+
+# Dados locais legados (armazenamento agora e PostgreSQL)
+data/
+
+# Logs e temporarios
+*.log
+npm-debug.log*

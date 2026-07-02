@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Repositorio de Projetos</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topo">
+    <div class="container topo-conteudo">
+      <h1>📁 Repositorio de Projetos</h1>
+      <p class="subtitulo">Cadastre, organize e acompanhe todos os seus projetos</p>
+    </div>
+  </header>
+
+  <main class="container">
+    <!-- Estatisticas -->
+    <section class="stats" id="stats">
+      <div class="stat-card"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Total de Projetos</span></div>
+    </section>
+
+    <div class="grid-principal">
+      <!-- Formulario -->
+      <section class="painel formulario">
+        <h2 id="form-titulo">Novo Projeto</h2>
+        <form id="form-projeto">
+          <input type="hidden" id="projeto-id" />
+          <label>Nome *
+            <input type="text" id="nome" placeholder="Ex: Sistema de Vendas" required />
+          </label>
+          <label>Descricao
+            <textarea id="descricao" rows="3" placeholder="Sobre o que e este projeto..."></textarea>
+          </label>
+          <label>Tema
+            <input type="text" id="tema" list="temas-existentes" placeholder="Ex: Educacao, Saude..." />
+          </label>
+          <label>Programa
+            <input type="text" id="programa" list="programas-existentes" placeholder="Ex: Programa Jovem..." />
+          </label>
+          <label>Tags (separadas por virgula)
+            <input type="text" id="tags" placeholder="web, node, api" />
+          </label>
+          <label>Link / Repositorio
+            <input type="url" id="url" placeholder="https://github.com/..." />
+          </label>
+          <label>Imagem
+            <input type="file" id="imagem-arquivo" accept="image/*" />
+          </label>
+          <div id="imagem-previa" class="imagem-previa" hidden>
+            <img id="imagem-previa-img" alt="Previa da imagem" />
+            <button type="button" class="btn btn-neutro btn-pequeno" id="btn-remover-imagem">Remover imagem</button>
+          </div>
+          <div class="form-acoes">
+            <button type="submit" class="btn btn-primario" id="btn-salvar">Adicionar</button>
+            <button type="button" class="btn btn-neutro" id="btn-cancelar" hidden>Cancelar</button>
+          </div>
+        </form>
+      </section>
+
+      <!-- Lista -->
+      <section class="painel lista">
+        <div class="barra-busca">
+          <input type="text" id="busca" placeholder="🔍 Buscar por nome, descricao, tema, programa ou tag..." />
+          <select id="filtro-tema">
+            <option value="">Todos os temas</option>
+          </select>
+          <select id="filtro-programa">
+            <option value="">Todos os programas</option>
+          </select>
+          <select id="ordenar">
+            <option value="recentes">Mais recentes</option>
+            <option value="antigos">Mais antigos</option>
+            <option value="nome">Nome (A-Z)</option>
+            <option value="nome-desc">Nome (Z-A)</option>
+            <option value="tema">Tema (A-Z)</option>
+            <option value="programa">Programa (A-Z)</option>
+            <option value="tags">Mais tags</option>
+          </select>
+        </div>
+        <datalist id="temas-existentes"></datalist>
+        <datalist id="programas-existentes"></datalist>
+        <div id="lista-projetos" class="cards"></div>
+        <p id="vazio" class="vazio" hidden>Nenhum projeto encontrado. Cadastre o primeiro! 🚀</p>
+      </section>
+    </div>
+  </main>
+
+  <!-- Modal de edicao -->
+  <div id="modal-editar" class="modal" hidden>
+    <div class="modal-fundo" data-fechar></div>
+    <div class="modal-caixa" role="dialog" aria-modal="true" aria-labelledby="modal-titulo">
+      <div class="modal-topo">
+        <h2 id="modal-titulo">Editar Projeto</h2>
+        <button type="button" class="modal-x" id="modal-fechar" aria-label="Fechar">✕</button>
+      </div>
+      <form id="form-editar">
+        <input type="hidden" id="e-id" />
+        <label>Nome *
+          <input type="text" id="e-nome" required />
+        </label>
+        <label>Descricao
+          <textarea id="e-descricao" rows="3"></textarea>
+        </label>
+        <label>Tema
+          <input type="text" id="e-tema" list="temas-existentes" />
+        </label>
+        <label>Programa
+          <input type="text" id="e-programa" list="programas-existentes" />
+        </label>
+        <label>Tags (separadas por virgula)
+          <input type="text" id="e-tags" />
+        </label>
+        <label>Link / Repositorio
+          <input type="url" id="e-url" />
+        </label>
+        <label>Imagem
+          <input type="file" id="e-imagem-arquivo" accept="image/*" />
+        </label>
+        <div id="e-imagem-previa" class="imagem-previa" hidden>
+          <img id="e-imagem-previa-img" alt="Previa da imagem" />
+          <button type="button" class="btn btn-neutro btn-pequeno" id="e-btn-remover-imagem">Remover imagem</button>
+        </div>
+        <div class="form-acoes">
+          <button type="submit" class="btn btn-primario">Salvar Alteracoes</button>
+          <button type="button" class="btn btn-neutro" data-fechar>Cancelar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <footer class="rodape">
+    <div class="container">Repositorio de Projetos &middot; Sistema local</div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
