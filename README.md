@@ -24,10 +24,27 @@ Para desenvolvimento com auto-reload: `npm run dev`
 As tabelas sao criadas automaticamente na primeira execucao.
 
 ## Banco de dados
-A conexao usa a variavel de ambiente `DATABASE_URL` (com um fallback embutido em `db.js`):
+A conexao usa a variavel de ambiente `DATABASE_URL`. Copie `.env.example` para `.env` e preencha:
 ```bash
-DATABASE_URL="postgres://usuario:senha@host:porta/banco?sslmode=disable" npm start
+cp .env.example .env
+# edite o .env com a sua string de conexao
+npm start
 ```
+
+## Docker
+Requer um arquivo `.env` com a `DATABASE_URL` (nao vai para a imagem).
+
+Com docker compose (recomendado):
+```bash
+docker compose up --build
+```
+
+Ou com Docker direto:
+```bash
+docker build -t hub-projetos .
+docker run --rm -p 3000:3000 --env-file .env hub-projetos
+```
+Acesse: http://localhost:3000
 
 ## Tecnologias
 - Node.js + Express (backend/API REST)

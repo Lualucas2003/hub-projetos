@@ -1,0 +1,10 @@
+services:
+  app:
+    build: .
+    image: hub-projetos
+    ports:
+      - "3000:3000"
+    # Injeta as variaveis do .env (inclui DATABASE_URL) dentro do container
+    env_file:
+      - .env
+    restart: unless-stopped
