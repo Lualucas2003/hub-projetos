@@ -289,7 +289,7 @@ form input:focus, form textarea:focus, form select:focus {
   display: block;
   width: 100%;
   text-align: center;
-  background: var(--teal);
+  background: var(--azul);
   color: #fff;
   font-weight: 700;
   font-size: 0.9rem;
@@ -297,9 +297,9 @@ form input:focus, form textarea:focus, form select:focus {
   padding: 0.65rem 1rem;
   border-radius: 8px;
   text-decoration: none;
-  transition: background 0.15s;
+  transition: background 0.15s, filter 0.15s;
 }
-.btn-acessar:hover { background: var(--teal-forte); }
+.btn-acessar:hover { filter: brightness(0.92); }
 
 /* Acoes (editar / excluir) - canto superior direito */
 .card-acoes { position: absolute; top: 0.6rem; right: 0.6rem; display: flex; gap: 0.3rem; }
