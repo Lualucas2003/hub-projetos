@@ -452,12 +452,15 @@ async function atualizarAcessos() {
 
 function renderAcessos() {
   const termo = (buscaAcessosEl.value || "").toLowerCase().trim();
-  const itens = acessosCache.filter(
-    (p) =>
-      !termo ||
-      p.nome.toLowerCase().includes(termo) ||
-      (p.login || "").toLowerCase().includes(termo)
-  );
+  const itens = acessosCache
+    // So produtos que tenham login E senha preenchidos
+    .filter((p) => (p.login || "").trim() && (p.senha || "").trim())
+    .filter(
+      (p) =>
+        !termo ||
+        p.nome.toLowerCase().includes(termo) ||
+        (p.login || "").toLowerCase().includes(termo)
+    );
 
   listaAcessosEl.innerHTML = "";
   vazioAcessosEl.hidden = itens.length > 0;
