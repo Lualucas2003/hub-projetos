@@ -167,10 +167,10 @@ csvArquivoEl.addEventListener("change", async () => {
     const projetos = csvParaProjetos(texto);
     const validos = projetos.filter((p) => p.nome);
     if (!validos.length) {
-      alert("Nenhum projeto valido encontrado no CSV (verifique a coluna 'nome').");
+      alert("Nenhum produto valido encontrado no CSV (verifique a coluna 'produto').");
       return;
     }
-    if (!confirm(`Importar ${validos.length} projeto(s) do arquivo?`)) return;
+    if (!confirm(`Importar ${validos.length} produto(s) do arquivo?`)) return;
 
     const res = await fetch(`${API}/importar`, {
       method: "POST",
@@ -182,7 +182,7 @@ csvArquivoEl.addEventListener("change", async () => {
       alert(r.erro || "Erro ao importar o CSV.");
       return;
     }
-    let msg = `${r.inseridos} projeto(s) importado(s).`;
+    let msg = `${r.inseridos} produto(s) importado(s).`;
     if (r.ignorados) msg += ` ${r.ignorados} linha(s) ignorada(s) (sem nome).`;
     alert(msg);
     carregar();
@@ -455,7 +455,7 @@ function resetarForm() {
   form.reset();
   mostrarPrevia("");
   editandoId = null;
-  formTitulo.textContent = "Novo Projeto";
+  formTitulo.textContent = "Novo Produto";
   btnSalvar.textContent = "Adicionar";
   btnCancelar.hidden = true;
 }
@@ -464,7 +464,7 @@ btnCancelar.addEventListener("click", resetarForm);
 
 // ---- Excluir ----
 async function excluir(id, nome) {
-  if (!confirm(`Excluir o projeto "${nome}"?`)) return;
+  if (!confirm(`Excluir o produto "${nome}"?`)) return;
   await fetch(`${API}/${id}`, { method: "DELETE" });
   if (editandoId === id) resetarForm();
   carregar();
