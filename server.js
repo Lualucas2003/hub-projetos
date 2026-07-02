@@ -18,15 +18,6 @@ function normalizarImagem(imagem) {
   return v;
 }
 
-// Normaliza tags recebidas (array ou string separada por virgula) -> array
-function normalizarTags(tags) {
-  if (Array.isArray(tags)) return tags.map((t) => String(t).trim()).filter(Boolean);
-  return String(tags || "")
-    .split(",")
-    .map((t) => t.trim())
-    .filter(Boolean);
-}
-
 // Mapeia a opcao de ordenacao para uma clausula ORDER BY segura (whitelist)
 const ORDENACOES = {
   recentes: "criado_em DESC",
@@ -35,7 +26,6 @@ const ORDENACOES = {
   "nome-desc": "nome DESC",
   tema: "tema ASC, nome ASC",
   programa: "programa ASC, nome ASC",
-  tags: "cardinality(tags) DESC, nome ASC",
 };
 
 // ---- API ----
@@ -52,7 +42,7 @@ app.get("/api/projetos", async (req, res) => {
       valores.push(`%${termo}%`);
       const i = valores.length;
       condicoes.push(
-        `(nome ILIKE $${i} OR descricao ILIKE $${i} OR tema ILIKE $${i} OR programa ILIKE $${i} OR array_to_string(tags, ',') ILIKE $${i})`
+        `(nome ILIKE $${i} OR descricao ILIKE $${i} OR tema ILIKE $${i} OR programa ILIKE $${i} OR login ILIKE $${i})`
       );
     }
     if (status) {
@@ -108,18 +98,19 @@ app.post("/api/projetos", async (req, res) => {
       nome,
       descricao = "",
       status = "ativo",
-      tags = [],
       url = "",
       tema = "",
       programa = "",
+      login = "",
+      senha = "",
       imagem = "",
     } = req.body || {};
     if (!nome || !String(nome).trim()) {
-      return res.status(400).json({ erro: "O nome do projeto e obrigatorio." });
+      return res.status(400).json({ erro: "O nome do produto e obrigatorio." });
     }
     const { rows } = await pool.query(
-      `INSERT INTO projetos (nome, descricao, status, tema, programa, tags, url, imagem)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8)
+      `INSERT INTO projetos (nome, descricao, status, tema, programa, url, login, senha, imagem)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
        RETURNING *`,
       [
         String(nome).trim(),
@@ -127,8 +118,9 @@ app.post("/api/projetos", async (req, res) => {
         status,
         String(tema).trim(),
         String(programa).trim(),
-        normalizarTags(tags),
         String(url).trim(),
+        String(login).trim(),
+        String(senha),
         normalizarImagem(imagem),
       ]
     );
@@ -159,15 +151,16 @@ app.post("/api/projetos/importar", async (req, res) => {
         continue;
       }
       await cliente.query(
-        `INSERT INTO projetos (nome, descricao, tema, programa, tags, url)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
+        `INSERT INTO projetos (nome, descricao, tema, programa, url, login, senha)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
         [
           nome,
           String(p.descricao || "").trim(),
           String(p.tema || "").trim(),
           String(p.programa || "").trim(),
-          normalizarTags(p.tags),
           String(p.url || "").trim(),
+          String(p.login || "").trim(),
+          String(p.senha || ""),
         ]
       );
       inseridos++;
@@ -186,7 +179,7 @@ app.post("/api/projetos/importar", async (req, res) => {
 // Atualizar
 app.put("/api/projetos/:id", async (req, res) => {
   try {
-    const { nome, descricao, status, tags, url, tema, programa, imagem } = req.body || {};
+    const { nome, descricao, status, url, tema, programa, login, senha, imagem } = req.body || {};
 
     // Monta atualizacao dinamica apenas com os campos enviados
     const campos = [];
@@ -202,7 +195,8 @@ app.put("/api/projetos/:id", async (req, res) => {
     if (tema !== undefined) set("tema", String(tema).trim());
     if (programa !== undefined) set("programa", String(programa).trim());
     if (url !== undefined) set("url", String(url).trim());
-    if (tags !== undefined) set("tags", normalizarTags(tags));
+    if (login !== undefined) set("login", String(login).trim());
+    if (senha !== undefined) set("senha", String(senha));
     if (imagem !== undefined) set("imagem", normalizarImagem(imagem));
 
     if (!campos.length) {

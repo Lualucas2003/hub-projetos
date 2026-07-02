@@ -26,11 +26,11 @@
         <h2 id="form-titulo">Novo Projeto</h2>
         <form id="form-projeto">
           <input type="hidden" id="projeto-id" />
-          <label>Nome *
-            <input type="text" id="nome" placeholder="Ex: Sistema de Vendas" required />
+          <label>Produto *
+            <input type="text" id="nome" placeholder="Ex: Eleitoral, Saude, Educacao..." required />
           </label>
           <label>Descricao
-            <textarea id="descricao" rows="3" placeholder="Sobre o que e este projeto..."></textarea>
+            <textarea id="descricao" rows="3" placeholder="Sobre o que e este produto..."></textarea>
           </label>
           <label>Tema
             <input type="text" id="tema" list="temas-existentes" placeholder="Ex: Educacao, Saude..." />
@@ -38,11 +38,14 @@
           <label>Programa
             <input type="text" id="programa" list="programas-existentes" placeholder="Ex: Programa Jovem..." />
           </label>
-          <label>Tags (separadas por virgula)
-            <input type="text" id="tags" placeholder="web, node, api" />
+          <label>Link de acesso
+            <input type="url" id="url" placeholder="https://..." />
           </label>
-          <label>Link / Repositorio
-            <input type="url" id="url" placeholder="https://github.com/..." />
+          <label>Login
+            <input type="text" id="login" placeholder="Ex: @pgseplan" />
+          </label>
+          <label>Senha
+            <input type="text" id="senha" placeholder="Senha de acesso" />
           </label>
           <label>Imagem
             <input type="file" id="imagem-arquivo" accept="image/*" />
@@ -68,7 +71,7 @@
           <button type="button" class="link-modelo" id="baixar-modelo">Baixar modelo CSV</button>
         </div>
         <div class="barra-busca">
-          <input type="text" id="busca" placeholder="🔍 Buscar por nome, descricao, tema, programa ou tag..." />
+          <input type="text" id="busca" placeholder="🔍 Buscar por produto, descricao, tema, programa ou login..." />
           <select id="filtro-tema">
             <option value="">Todos os temas</option>
           </select>
@@ -82,7 +85,6 @@
             <option value="nome-desc">Nome (Z-A)</option>
             <option value="tema">Tema (A-Z)</option>
             <option value="programa">Programa (A-Z)</option>
-            <option value="tags">Mais tags</option>
           </select>
         </div>
         <datalist id="temas-existentes"></datalist>
@@ -103,7 +105,7 @@
       </div>
       <form id="form-editar">
         <input type="hidden" id="e-id" />
-        <label>Nome *
+        <label>Produto *
           <input type="text" id="e-nome" required />
         </label>
         <label>Descricao
@@ -115,11 +117,14 @@
         <label>Programa
           <input type="text" id="e-programa" list="programas-existentes" />
         </label>
-        <label>Tags (separadas por virgula)
-          <input type="text" id="e-tags" />
-        </label>
-        <label>Link / Repositorio
+        <label>Link de acesso
           <input type="url" id="e-url" />
+        </label>
+        <label>Login
+          <input type="text" id="e-login" />
+        </label>
+        <label>Senha
+          <input type="text" id="e-senha" />
         </label>
         <label>Imagem
           <input type="file" id="e-imagem-arquivo" accept="image/*" />

@@ -4,12 +4,12 @@ Sistema web para **cadastrar, organizar e acompanhar projetos**. Tema visual em 
 
 ## Recursos
 - Cadastrar, editar e excluir projetos
-- Tema, programa, tags, descricao e link do repositorio
-- Imagem por projeto (enviada e armazenada em base64)
-- Importacao em lote via CSV (com modelo para baixar)
-- Busca por nome/descricao/tema/programa/tag
+- Campos: produto, descricao, tema, programa, link de acesso, login, senha, imagem
+- Imagem por produto (enviada e armazenada em base64)
+- Importacao em lote via CSV (entende cabecalho produto/link de acesso/login/senha)
+- Busca por produto/descricao/tema/programa/login
 - Filtros por tema e programa
-- Ordenacao (recentes, antigos, nome, tema, programa, mais tags)
+- Ordenacao (recentes, antigos, nome, tema, programa)
 - Painel de estatisticas (total de projetos)
 - Dados salvos em banco **PostgreSQL** (tabela `projetos`)
 

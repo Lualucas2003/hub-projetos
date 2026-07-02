@@ -127,16 +127,24 @@ function csvParaProjetos(texto) {
   if (!linhas.length) return [];
 
   const cabecalho = linhas[0].map((h) => semAcento(h.trim().toLowerCase()));
-  const idx = (nome) => cabecalho.indexOf(nome);
-  const iNome = idx("nome");
-  const iDesc = idx("descricao");
+  // Aceita varios nomes de coluna (ex.: "produto" ou "nome", "link de acesso" ou "url")
+  const idx = (...nomes) => {
+    for (const n of nomes) {
+      const i = cabecalho.indexOf(n);
+      if (i !== -1) return i;
+    }
+    return -1;
+  };
+  const iNome = idx("produto", "nome");
+  const iDesc = idx("descricao", "descricao");
   const iTema = idx("tema");
   const iProg = idx("programa");
-  const iTags = idx("tags");
-  const iUrl = idx("url");
+  const iUrl = idx("link de acesso", "link", "url");
+  const iLogin = idx("login", "usuario");
+  const iSenha = idx("senha");
 
   if (iNome === -1) {
-    throw new Error('O CSV precisa ter uma coluna "nome" no cabecalho.');
+    throw new Error('O CSV precisa ter uma coluna "produto" (ou "nome") no cabecalho.');
   }
 
   const val = (l, i) => (i >= 0 && i < l.length ? l[i].trim() : "");
@@ -145,9 +153,9 @@ function csvParaProjetos(texto) {
     descricao: val(l, iDesc),
     tema: val(l, iTema),
     programa: val(l, iProg),
-    // tags separadas por ; ou , dentro da celula
-    tags: val(l, iTags).split(/[;,]/).map((t) => t.trim()).filter(Boolean),
     url: val(l, iUrl),
+    login: val(l, iLogin),
+    senha: val(l, iSenha),
   }));
 }
 
@@ -188,9 +196,9 @@ csvArquivoEl.addEventListener("change", async () => {
 // Gera e baixa um CSV de exemplo
 btnBaixarModelo.addEventListener("click", () => {
   const modelo =
-    "nome,descricao,tema,programa,tags,url\n" +
-    'Portal do Cidadao,Servicos online da prefeitura,Educacao,Programa Jovem,web;react,https://exemplo.gov\n' +
-    'App Saude,Agendamento de consultas,Saude,Programa Bem-Estar,mobile;flutter,\n';
+    "produto,link de acesso,login,senha\n" +
+    "Eleitoral,https://info-bill-pope.shinyapps.io/app-eleitoral/,@pgseplan,seplan123\n" +
+    "Entregas no territorio,https://evolution-sistema-entregas.ep9oni.easypanel.host/,visualizador,jc2026\n";
   const blob = new Blob([modelo], { type: "text/csv;charset=utf-8" });
   const a = document.createElement("a");
   a.href = URL.createObjectURL(blob);
@@ -262,8 +270,9 @@ formEditar.addEventListener("submit", async (e) => {
     descricao: document.getElementById("e-descricao").value,
     tema: document.getElementById("e-tema").value,
     programa: document.getElementById("e-programa").value,
-    tags: document.getElementById("e-tags").value,
     url: document.getElementById("e-url").value,
+    login: document.getElementById("e-login").value,
+    senha: document.getElementById("e-senha").value,
     imagem: imagemEdicao,
   };
   if (!dados.nome.trim()) return;
@@ -334,7 +343,6 @@ function render(projetos) {
   for (const p of projetos) {
     const card = document.createElement("div");
     card.className = "card";
-    const tags = (p.tags || []).map((t) => `<span class="tag">${escapar(t)}</span>`).join("");
     const link = p.url
       ? `<a class="card-link" href="${escapar(p.url)}" target="_blank" rel="noopener">🔗 Abrir</a>`
       : "<span></span>";
@@ -348,6 +356,13 @@ function render(projetos) {
       ? `<img class="card-imagem" src="${escapar(p.imagem)}" alt="Imagem de ${escapar(p.nome)}" loading="lazy" />`
       : "";
 
+    const credenciais = [
+      p.login ? `<div class="cred"><span class="cred-rot">👤 Login</span><span class="cred-val">${escapar(p.login)}</span></div>` : "",
+      p.senha
+        ? `<div class="cred"><span class="cred-rot">🔑 Senha</span><span class="cred-val senha" data-senha="${escapar(p.senha)}">••••••••</span><button type="button" class="ver-senha" title="Mostrar/ocultar">👁️</button></div>`
+        : "",
+    ].join("");
+
     card.innerHTML = `
       ${imagem}
       <div class="card-topo">
@@ -355,7 +370,7 @@ function render(projetos) {
       </div>
       ${meta ? `<div class="card-meta">${meta}</div>` : ""}
       ${p.descricao ? `<p class="card-desc">${escapar(p.descricao)}</p>` : ""}
-      ${tags ? `<div class="card-tags">${tags}</div>` : ""}
+      ${credenciais ? `<div class="card-cred">${credenciais}</div>` : ""}
       <div class="card-rodape">
         ${link}
         <div class="card-acoes">
@@ -366,6 +381,14 @@ function render(projetos) {
 
     card.querySelector(".editar").addEventListener("click", () => iniciarEdicao(p));
     card.querySelector(".excluir").addEventListener("click", () => excluir(p.id, p.nome));
+    const btnVer = card.querySelector(".ver-senha");
+    if (btnVer) {
+      btnVer.addEventListener("click", () => {
+        const el = card.querySelector(".cred-val.senha");
+        const revelada = el.classList.toggle("revelada");
+        el.textContent = revelada ? el.dataset.senha : "••••••••";
+      });
+    }
     listaEl.appendChild(card);
   }
 }
@@ -378,8 +401,9 @@ form.addEventListener("submit", async (e) => {
     descricao: document.getElementById("descricao").value,
     tema: document.getElementById("tema").value,
     programa: document.getElementById("programa").value,
-    tags: document.getElementById("tags").value,
     url: document.getElementById("url").value,
+    login: document.getElementById("login").value,
+    senha: document.getElementById("senha").value,
     imagem: imagemAtual,
   };
   if (!dados.nome.trim()) return;
@@ -408,8 +432,9 @@ function iniciarEdicao(p) {
   document.getElementById("e-descricao").value = p.descricao || "";
   document.getElementById("e-tema").value = p.tema || "";
   document.getElementById("e-programa").value = p.programa || "";
-  document.getElementById("e-tags").value = (p.tags || []).join(", ");
   document.getElementById("e-url").value = p.url || "";
+  document.getElementById("e-login").value = p.login || "";
+  document.getElementById("e-senha").value = p.senha || "";
   eImagemArquivo.value = "";
   mostrarPreviaEdicao(p.imagem || "");
   abrirModal();

@@ -155,15 +155,18 @@ form input:focus, form textarea:focus, form select:focus {
 .meta-item { font-size: 0.82rem; font-weight: 600; color: var(--vermelho-escuro); }
 
 .card-desc { margin: 0.5rem 0; color: #555; font-size: 0.92rem; }
-.card-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.5rem 0; }
-.tag {
-  background: var(--amarelo-claro);
-  color: #8a6d00;
-  font-size: 0.75rem;
-  padding: 0.15rem 0.55rem;
-  border-radius: 6px;
-  font-weight: 600;
+
+/* Credenciais (login / senha) */
+.card-cred { display: flex; flex-direction: column; gap: 0.3rem; margin: 0.6rem 0; }
+.cred { display: flex; align-items: center; gap: 0.5rem; font-size: 0.85rem; }
+.cred-rot { color: #777; font-weight: 600; min-width: 74px; }
+.cred-val { font-weight: 600; color: var(--cinza-texto); font-family: "Consolas", monospace; }
+.cred-val.senha { letter-spacing: 1px; }
+.ver-senha {
+  background: none; border: none; cursor: pointer; font-size: 0.9rem;
+  padding: 0; line-height: 1; opacity: 0.7;
 }
+.ver-senha:hover { opacity: 1; }
 .card-rodape { display: flex; justify-content: space-between; align-items: center; margin-top: 0.6rem; }
 .card-link { color: var(--vermelho); font-weight: 600; text-decoration: none; font-size: 0.88rem; }
 .card-link:hover { text-decoration: underline; }
