@@ -8,7 +8,13 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const app = express();
 // Limite ampliado para acomodar imagens em base64
 app.use(express.json({ limit: "12mb" }));
-app.use(express.static(join(__dirname, "public")));
+app.use(
+  express.static(join(__dirname, "public"), {
+    etag: true,
+    // Forca o navegador a revalidar (evita servir app.js/style.css em cache antigo)
+    setHeaders: (res) => res.setHeader("Cache-Control", "no-cache"),
+  })
+);
 
 // Valida/normaliza a imagem recebida: aceita apenas data URL de imagem (base64)
 function normalizarImagem(imagem) {
