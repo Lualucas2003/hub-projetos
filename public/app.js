@@ -69,6 +69,21 @@ verCards.addEventListener("click", () => definirModo("cards"));
 verLista.addEventListener("click", () => definirModo("lista"));
 definirModo(localStorage.getItem("modoVisual") || "cards");
 
+// ---- Tema claro / escuro ----
+const btnTema = document.getElementById("btn-tema");
+function definirTema(tema) {
+  const escuro = tema === "escuro";
+  document.body.classList.toggle("tema-escuro", escuro);
+  btnTema.textContent = escuro ? "☀️" : "🌙";
+  try {
+    localStorage.setItem("tema", tema);
+  } catch {}
+}
+btnTema.addEventListener("click", () =>
+  definirTema(document.body.classList.contains("tema-escuro") ? "claro" : "escuro")
+);
+definirTema(localStorage.getItem("tema") || "claro");
+
 // ---- Helpers ----
 function escapar(txt = "") {
   return String(txt).replace(/[&<>"']/g, (c) =>
