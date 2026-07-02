@@ -25,6 +25,7 @@
       <span class="menu-titulo">Menu</span>
       <button id="menu-fechar" class="modal-x" aria-label="Fechar menu">✕</button>
     </div>
+    <button type="button" class="menu-item" data-view="inicio">🏠 Início</button>
     <button type="button" class="menu-item" data-view="cadastro">➕ Novo Produto</button>
     <button type="button" class="menu-item" data-view="acessos">🔑 Acessos</button>
   </nav>
@@ -78,8 +79,8 @@
       </section>
     </section>
 
-    <!-- Tela: Acessos -->
-    <section id="view-acessos" class="view">
+    <!-- Tela: Inicio -->
+    <section id="view-inicio" class="view">
       <section class="stats" id="stats">
         <div class="stat-card"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Total de Produtos</span></div>
         <div class="stat-card azul"><span class="stat-num" id="stat-paineis">0</span><span class="stat-label">Total de Paineis</span></div>
@@ -119,6 +120,18 @@
         </div>
         <div id="lista-projetos" class="cards"></div>
         <p id="vazio" class="vazio" hidden>Nenhum produto encontrado. Cadastre o primeiro! 🚀</p>
+      </section>
+    </section>
+
+    <!-- Tela: Acessos (lista de credenciais) -->
+    <section id="view-acessos" class="view" hidden>
+      <section class="painel">
+        <h2>🔑 Credenciais de Acesso</h2>
+        <div class="barra-busca">
+          <input type="text" id="busca-acessos" placeholder="🔍 Buscar por produto ou login..." />
+        </div>
+        <div id="lista-acessos" class="tabela-acessos"></div>
+        <p id="vazio-acessos" class="vazio" hidden>Nenhum acesso cadastrado ainda. 🔒</p>
       </section>
     </section>
   </main>

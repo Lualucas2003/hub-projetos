@@ -25,6 +25,7 @@ const btnMenu = document.getElementById("btn-menu");
 const menuLateral = document.getElementById("menu-lateral");
 const menuOverlay = document.getElementById("menu-overlay");
 const menuFechar = document.getElementById("menu-fechar");
+const viewInicio = document.getElementById("view-inicio");
 const viewCadastro = document.getElementById("view-cadastro");
 const viewAcessos = document.getElementById("view-acessos");
 
@@ -40,13 +41,14 @@ btnMenu.addEventListener("click", abrirMenu);
 menuFechar.addEventListener("click", fecharMenu);
 menuOverlay.addEventListener("click", fecharMenu);
 
-// Alterna entre a tela de cadastro e a de acessos
+// Alterna entre as telas Inicio / Novo Produto / Acessos
 function mostrarView(nome) {
-  const ehCadastro = nome === "cadastro";
-  viewCadastro.hidden = !ehCadastro;
-  viewAcessos.hidden = ehCadastro;
+  const views = { inicio: viewInicio, cadastro: viewCadastro, acessos: viewAcessos };
+  const alvo = views[nome] ? nome : "inicio";
+  Object.entries(views).forEach(([k, el]) => (el.hidden = k !== alvo));
   fecharMenu();
-  if (!ehCadastro) carregar();
+  if (alvo === "inicio") carregar();
+  if (alvo === "acessos") atualizarAcessos();
 }
 document.querySelectorAll(".menu-item").forEach((b) =>
   b.addEventListener("click", () => mostrarView(b.dataset.view))
@@ -430,6 +432,69 @@ function render(projetos) {
     listaEl.appendChild(card);
   }
 }
+
+// ---- Aba Acessos: lista de credenciais ----
+const listaAcessosEl = document.getElementById("lista-acessos");
+const vazioAcessosEl = document.getElementById("vazio-acessos");
+const buscaAcessosEl = document.getElementById("busca-acessos");
+let acessosCache = [];
+
+async function atualizarAcessos() {
+  const res = await fetch(API);
+  acessosCache = await res.json();
+  renderAcessos();
+}
+
+function renderAcessos() {
+  const termo = (buscaAcessosEl.value || "").toLowerCase().trim();
+  const itens = acessosCache.filter(
+    (p) =>
+      !termo ||
+      p.nome.toLowerCase().includes(termo) ||
+      (p.login || "").toLowerCase().includes(termo)
+  );
+
+  listaAcessosEl.innerHTML = "";
+  vazioAcessosEl.hidden = itens.length > 0;
+
+  for (const p of itens) {
+    const linha = document.createElement("div");
+    linha.className = "acesso-linha";
+
+    const senhaCel = p.senha
+      ? `<span class="acesso-val senha" data-senha="${escapar(p.senha)}">••••••••</span><button type="button" class="ver-senha" title="Mostrar/ocultar">👁️</button>`
+      : `<span class="acesso-val vazio-cel">—</span>`;
+
+    const acao = p.url
+      ? `<a class="btn-acessar" href="${escapar(p.url)}" target="_blank" rel="noopener">ACESSO</a>`
+      : `<span class="sem-link">Sem link</span>`;
+
+    linha.innerHTML = `
+      <div class="acesso-produto">
+        <span class="tipo-tag ${p.tipo === "ficha" ? "ficha" : "painel"}">${p.tipo === "ficha" ? "Ficha" : "Painel"}</span>
+        <span class="acesso-nome">${escapar(p.nome)}</span>
+      </div>
+      <div class="acesso-campo"><span class="acesso-rot">Login</span><span class="acesso-val">${p.login ? escapar(p.login) : "—"}</span></div>
+      <div class="acesso-campo"><span class="acesso-rot">Senha</span>${senhaCel}</div>
+      <div class="acesso-acao">${acao}</div>`;
+
+    const btnVer = linha.querySelector(".ver-senha");
+    if (btnVer) {
+      btnVer.addEventListener("click", () => {
+        const el = linha.querySelector(".acesso-val.senha");
+        const revelada = el.classList.toggle("revelada");
+        el.textContent = revelada ? el.dataset.senha : "••••••••";
+      });
+    }
+    listaAcessosEl.appendChild(linha);
+  }
+}
+
+let debounceAcessos;
+buscaAcessosEl.addEventListener("input", () => {
+  clearTimeout(debounceAcessos);
+  debounceAcessos = setTimeout(renderAcessos, 200);
+});
 
 // ---- Criar / Atualizar ----
 form.addEventListener("submit", async (e) => {
