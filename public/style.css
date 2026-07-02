@@ -196,77 +196,58 @@ form input:focus, form textarea:focus, form select:focus {
 /* Cards de produto - grade */
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
 .card {
+  position: relative;
   display: flex;
   flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 1rem;
+  min-height: 150px;
   border: 1px solid var(--borda);
   border-top: 3px solid var(--teal);
   border-radius: 12px;
-  padding: 1.1rem;
+  padding: 1.4rem 1.1rem 1.1rem;
   background: #fff;
   transition: box-shadow 0.15s, transform 0.1s;
 }
 .card:hover { box-shadow: var(--sombra); transform: translateY(-2px); }
 .card.painel { border-top-color: var(--azul); }
 .card.ficha { border-top-color: var(--roxo); }
-.card-imagem {
-  display: block;
-  width: 100%;
-  max-height: 130px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-bottom: 0.7rem;
-  border: 1px solid var(--borda);
-}
 
-/* Cabecalho do card: etiqueta de tipo + acoes */
-.card-cabecalho { display: flex; justify-content: space-between; align-items: center; gap: 0.5rem; margin-bottom: 0.6rem; }
-.tipo-tag {
-  font-size: 0.66rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-  padding: 0.2rem 0.6rem; border-radius: 20px; font-family: var(--mono);
+.card-nome {
+  font-size: 1.1rem; font-weight: 800; color: var(--texto);
+  text-transform: uppercase; letter-spacing: -0.2px; line-height: 1.25;
+  margin-top: 0.4rem;
 }
-.tipo-tag.painel { background: rgba(47, 125, 224, 0.12); color: var(--azul); }
-.tipo-tag.ficha { background: rgba(155, 81, 224, 0.12); color: var(--roxo); }
-
-.card-nome { font-size: 1.05rem; font-weight: 800; color: var(--texto); text-transform: uppercase; letter-spacing: -0.2px; line-height: 1.2; }
-.card-desc { margin: 0.4rem 0; color: #545b6b; font-size: 0.86rem; }
-
-/* Linhas de informacao (Tema / Programa / Login / Senha) */
-.card-infos { display: flex; flex-direction: column; gap: 0.25rem; margin: 0.6rem 0 0.9rem; }
-.info-linha { display: flex; align-items: center; gap: 0.4rem; font-size: 0.82rem; }
-.info-rot { color: var(--suave); font-family: var(--mono); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.3px; min-width: 66px; }
-.info-val { font-weight: 600; color: var(--texto); word-break: break-word; }
-.info-val.senha { font-family: var(--mono); letter-spacing: 1px; }
-.ver-senha {
-  background: none; border: none; cursor: pointer; font-size: 0.85rem;
-  padding: 0; line-height: 1; opacity: 0.7;
-}
-.ver-senha:hover { opacity: 1; }
+.sem-link { margin-top: auto; color: var(--suave); font-size: 0.8rem; font-style: italic; }
 
 /* Botao Acessar (acao principal) */
 .btn-acessar {
   margin-top: auto;
   display: block;
+  width: 100%;
   text-align: center;
   background: var(--teal);
   color: #fff;
   font-weight: 700;
   font-size: 0.9rem;
-  padding: 0.6rem 1rem;
+  letter-spacing: 0.5px;
+  padding: 0.65rem 1rem;
   border-radius: 8px;
   text-decoration: none;
   transition: background 0.15s;
 }
 .btn-acessar:hover { background: var(--teal-forte); }
 
-/* Acoes (editar / excluir) */
-.card-acoes { display: flex; gap: 0.35rem; }
+/* Acoes (editar / excluir) - canto superior direito */
+.card-acoes { position: absolute; top: 0.6rem; right: 0.6rem; display: flex; gap: 0.3rem; }
 .acao {
-  background: none;
+  background: rgba(255, 255, 255, 0.9);
   border: 1px solid var(--borda);
   border-radius: 6px;
-  padding: 0.25rem 0.45rem;
+  padding: 0.2rem 0.4rem;
   cursor: pointer;
-  font-size: 0.8rem;
+  font-size: 0.78rem;
   line-height: 1;
   color: var(--texto);
 }
