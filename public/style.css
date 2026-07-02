@@ -123,17 +123,17 @@ form input, form textarea, form select,
 .stat-card {
   background: var(--painel);
   border: 1px solid var(--borda);
-  border-top: 3px solid var(--teal);
+  border-top: 3px solid var(--acesso);
   border-radius: 12px;
   padding: 1rem;
   text-align: center;
   box-shadow: var(--sombra);
 }
-.stat-card.azul { border-top-color: var(--azul); }
-.stat-card.roxo { border-top-color: var(--roxo); }
-.stat-num { display: block; font-size: 2rem; font-weight: 800; color: var(--teal); }
-.stat-card.azul .stat-num { color: var(--azul); }
-.stat-card.roxo .stat-num { color: var(--roxo); }
+.stat-card.azul { border-top-color: var(--acesso); }
+.stat-card.roxo { border-top-color: var(--acesso); }
+.stat-num { display: block; font-size: 2rem; font-weight: 800; color: var(--acesso); }
+.stat-card.azul .stat-num { color: var(--acesso); }
+.stat-card.roxo .stat-num { color: var(--acesso); }
 .stat-label {
   font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px;
   color: var(--suave); font-family: var(--mono);
