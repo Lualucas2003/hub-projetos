@@ -406,24 +406,35 @@ form.addEventListener("submit", async (e) => {
     senha: document.getElementById("senha").value,
     imagem: imagemAtual,
   };
-  if (!dados.nome.trim()) return;
+  if (!dados.nome.trim()) {
+    alert("Informe o produto.");
+    return;
+  }
+  if (!dados.url.trim()) {
+    alert("Informe o link de acesso.");
+    return;
+  }
 
   const metodo = editandoId ? "PUT" : "POST";
   const endpoint = editandoId ? `${API}/${editandoId}` : API;
 
-  const res = await fetch(endpoint, {
-    method: metodo,
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(dados),
-  });
+  try {
+    const res = await fetch(endpoint, {
+      method: metodo,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(dados),
+    });
 
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}));
-    alert(err.erro || "Erro ao salvar o projeto.");
-    return;
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      alert(err.erro || `Erro ao salvar (HTTP ${res.status}).`);
+      return;
+    }
+    resetarForm();
+    carregar();
+  } catch (err) {
+    alert("Falha de conexao ao salvar: " + (err.message || err));
   }
-  resetarForm();
-  carregar();
 });
 
 function iniciarEdicao(p) {
