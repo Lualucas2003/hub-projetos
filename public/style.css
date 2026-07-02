@@ -372,7 +372,7 @@ form input:focus, form textarea:focus, form select:focus {
   background: var(--painel);
   border: 1px solid var(--borda);
   border-radius: 14px;
-  border-top: 3px solid var(--azul);
+  border-top: 3px solid var(--acesso);
   box-shadow: 0 16px 50px rgba(20, 25, 40, 0.25);
   width: min(480px, 100%);
   max-height: 90vh;
