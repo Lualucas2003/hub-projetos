@@ -385,6 +385,7 @@ function render(projetos) {
       : `<span class="sem-link">Sem link cadastrado</span>`;
 
     card.innerHTML = `
+      <span class="tipo-tag ${ehFicha ? "ficha" : "painel"}">${ehFicha ? "Ficha" : "Painel"}</span>
       <div class="card-acoes">
         <button class="acao editar" data-id="${p.id}" title="Editar">✏️</button>
         <button class="acao excluir" data-id="${p.id}" title="Excluir">🗑️</button>
