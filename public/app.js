@@ -20,6 +20,38 @@ const btnRemoverImagem = document.getElementById("btn-remover-imagem");
 let editandoId = null;
 let imagemAtual = ""; // data URL (base64) da imagem selecionada
 
+// ---- Menu lateral (hamburguer) e navegacao entre telas ----
+const btnMenu = document.getElementById("btn-menu");
+const menuLateral = document.getElementById("menu-lateral");
+const menuOverlay = document.getElementById("menu-overlay");
+const menuFechar = document.getElementById("menu-fechar");
+const viewCadastro = document.getElementById("view-cadastro");
+const viewAcessos = document.getElementById("view-acessos");
+
+function abrirMenu() {
+  menuLateral.classList.add("aberto");
+  menuOverlay.classList.add("aberto");
+}
+function fecharMenu() {
+  menuLateral.classList.remove("aberto");
+  menuOverlay.classList.remove("aberto");
+}
+btnMenu.addEventListener("click", abrirMenu);
+menuFechar.addEventListener("click", fecharMenu);
+menuOverlay.addEventListener("click", fecharMenu);
+
+// Alterna entre a tela de cadastro e a de acessos
+function mostrarView(nome) {
+  const ehCadastro = nome === "cadastro";
+  viewCadastro.hidden = !ehCadastro;
+  viewAcessos.hidden = ehCadastro;
+  fecharMenu();
+  if (!ehCadastro) carregar();
+}
+document.querySelectorAll(".menu-item").forEach((b) =>
+  b.addEventListener("click", () => mostrarView(b.dataset.view))
+);
+
 // ---- Helpers ----
 function escapar(txt = "") {
   return String(txt).replace(/[&<>"']/g, (c) =>
@@ -431,7 +463,7 @@ form.addEventListener("submit", async (e) => {
       return;
     }
     resetarForm();
-    carregar();
+    mostrarView("acessos");
   } catch (err) {
     alert("Falha de conexao ao salvar: " + (err.message || err));
   }

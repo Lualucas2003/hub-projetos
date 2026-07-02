@@ -9,19 +9,28 @@
 <body>
   <header class="topo">
     <div class="container topo-conteudo">
-      <h1>📁 Repositório de Produtos</h1>
-      <p class="subtitulo">Coordenação de Levantamento, Organização e Monitoramento de Dados</p>
+      <button id="btn-menu" class="hamburguer" aria-label="Abrir menu">☰</button>
+      <div class="topo-textos">
+        <h1>📁 Repositório de Produtos</h1>
+        <p class="subtitulo">Coordenação de Levantamento, Organização e Monitoramento de Dados</p>
+      </div>
     </div>
   </header>
 
-  <main class="container">
-    <!-- Estatisticas -->
-    <section class="stats" id="stats">
-      <div class="stat-card"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Total de Produtos</span></div>
-    </section>
+  <!-- Menu lateral (hamburguer) -->
+  <div id="menu-overlay" class="menu-overlay"></div>
+  <nav id="menu-lateral" class="menu-lateral" aria-label="Menu principal">
+    <div class="menu-topo">
+      <span class="menu-titulo">Menu</span>
+      <button id="menu-fechar" class="modal-x" aria-label="Fechar menu">✕</button>
+    </div>
+    <button type="button" class="menu-item" data-view="cadastro">➕ Novo Produto</button>
+    <button type="button" class="menu-item" data-view="acessos">🔑 Acessos</button>
+  </nav>
 
-    <div class="grid-principal">
-      <!-- Formulario -->
+  <main class="container">
+    <!-- Tela: Novo Produto -->
+    <section id="view-cadastro" class="view" hidden>
       <section class="painel formulario">
         <h2 id="form-titulo">Novo Produto</h2>
         <form id="form-projeto">
@@ -60,8 +69,14 @@
           </div>
         </form>
       </section>
+    </section>
 
-      <!-- Lista -->
+    <!-- Tela: Acessos -->
+    <section id="view-acessos" class="view">
+      <section class="stats" id="stats">
+        <div class="stat-card"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Total de Produtos</span></div>
+      </section>
+
       <section class="painel lista">
         <div class="barra-importar">
           <label class="btn btn-neutro btn-importar">
@@ -92,7 +107,7 @@
         <div id="lista-projetos" class="cards"></div>
         <p id="vazio" class="vazio" hidden>Nenhum produto encontrado. Cadastre o primeiro! 🚀</p>
       </section>
-    </div>
+    </section>
   </main>
 
   <!-- Modal de edicao -->
