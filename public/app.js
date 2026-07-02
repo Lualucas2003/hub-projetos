@@ -376,6 +376,7 @@ function render(projetos) {
   vazioEl.hidden = projetos.length > 0;
 
   for (const p of projetos) {
+    const card = document.createElement("div");
     const ehFicha = p.tipo === "ficha";
     card.className = `card ${ehFicha ? "ficha" : "painel"}`;
 
