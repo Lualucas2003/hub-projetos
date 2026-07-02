@@ -14,9 +14,9 @@
   --mono: "Consolas", "SF Mono", ui-monospace, Menlo, monospace;
 }
 
-/* Tema escuro (navy) */
+/* Tema escuro (navy) - fundo da pagina branco, painieis escuros */
 body.tema-escuro {
-  --fundo: #121623;
+  --fundo: #ffffff;
   --painel: #1a1f2e;
   --superficie: #222a3b;
   --borda: #2c3446;
