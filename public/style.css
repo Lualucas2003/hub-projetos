@@ -336,7 +336,7 @@ form input:focus, form textarea:focus, form select:focus {
 .tabela-acessos { display: flex; flex-direction: column; gap: 0.5rem; }
 .acesso-linha {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1.2fr auto;
+  grid-template-columns: 1.6fr 1fr 1.2fr;
   gap: 1rem;
   align-items: center;
   border: 1px solid var(--borda);
@@ -347,20 +347,21 @@ form input:focus, form textarea:focus, form select:focus {
 .acesso-produto { display: flex; align-items: center; gap: 0.5rem; min-width: 0; }
 .acesso-produto .tipo-tag { position: static; flex: none; }
 .acesso-nome { font-weight: 700; color: var(--texto); overflow: hidden; text-overflow: ellipsis; }
-.acesso-campo { display: flex; flex-direction: column; gap: 0.1rem; min-width: 0; }
+.acesso-campo { display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem; min-width: 0; }
 .acesso-rot { font-family: var(--mono); font-size: 0.62rem; text-transform: uppercase; letter-spacing: 0.4px; color: var(--suave); }
 .acesso-val { font-family: var(--mono); font-weight: 600; color: var(--texto); word-break: break-word; }
-.acesso-val.senha { letter-spacing: 1px; display: inline-flex; align-items: center; gap: 0.4rem; }
 .acesso-val.vazio-cel { color: var(--suave); }
-.acesso-campo .ver-senha { margin-left: 0.4rem; }
-.acesso-acao { justify-self: end; }
-.acesso-acao .btn-acessar { width: auto; margin: 0; padding: 0.45rem 1.1rem; }
-.acesso-acao .sem-link { margin: 0; }
+/* Senha + olho discreto, inline */
+.senha-box { display: inline-flex; align-items: center; gap: 0.35rem; }
+.senha-box .ver-senha {
+  background: none; border: none; padding: 0; margin: 0;
+  cursor: pointer; font-size: 0.8rem; line-height: 1;
+  opacity: 0.4; color: var(--suave);
+}
+.senha-box .ver-senha:hover { opacity: 0.9; }
 
 @media (max-width: 680px) {
   .acesso-linha { grid-template-columns: 1fr; gap: 0.5rem; }
-  .acesso-acao { justify-self: stretch; }
-  .acesso-acao .btn-acessar { width: 100%; text-align: center; }
 }
 
 /* Modal de edicao */

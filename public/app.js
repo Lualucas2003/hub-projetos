@@ -467,12 +467,8 @@ function renderAcessos() {
     linha.className = "acesso-linha";
 
     const senhaCel = p.senha
-      ? `<span class="acesso-val senha" data-senha="${escapar(p.senha)}">••••••••</span><button type="button" class="ver-senha" title="Mostrar/ocultar">👁️</button>`
+      ? `<span class="senha-box"><span class="acesso-val senha" data-senha="${escapar(p.senha)}">••••••••</span><button type="button" class="ver-senha" title="Mostrar/ocultar senha">👁</button></span>`
       : `<span class="acesso-val vazio-cel">—</span>`;
-
-    const acao = p.url
-      ? `<a class="btn-acessar" href="${escapar(p.url)}" target="_blank" rel="noopener">ACESSO</a>`
-      : `<span class="sem-link">Sem link</span>`;
 
     linha.innerHTML = `
       <div class="acesso-produto">
@@ -480,8 +476,7 @@ function renderAcessos() {
         <span class="acesso-nome">${escapar(p.nome)}</span>
       </div>
       <div class="acesso-campo"><span class="acesso-rot">Login</span><span class="acesso-val">${p.login ? escapar(p.login) : "—"}</span></div>
-      <div class="acesso-campo"><span class="acesso-rot">Senha</span>${senhaCel}</div>
-      <div class="acesso-acao">${acao}</div>`;
+      <div class="acesso-campo"><span class="acesso-rot">Senha</span>${senhaCel}</div>`;
 
     const btnVer = linha.querySelector(".ver-senha");
     if (btnVer) {
