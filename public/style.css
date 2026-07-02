@@ -193,8 +193,29 @@ form input:focus, form textarea:focus, form select:focus {
 .barra-busca select { flex: 1 1 130px; padding: 0.6rem; border: 1px solid var(--borda); border-radius: 8px; background: #fff; color: var(--texto); font-family: inherit; }
 .barra-busca input:focus, .barra-busca select:focus { outline: none; border-color: var(--teal); box-shadow: 0 0 0 3px rgba(14, 168, 125, 0.15); }
 
+/* Seletor de modo de visualizacao */
+.barra-visual { display: flex; gap: 0.4rem; justify-content: flex-end; margin-bottom: 0.9rem; }
+.btn-visual {
+  background: #fff; border: 1px solid var(--borda); border-radius: 8px;
+  padding: 0.4rem 0.85rem; cursor: pointer; font-size: 0.85rem; font-weight: 600;
+  color: var(--suave); font-family: inherit;
+}
+.btn-visual.ativo { border-color: var(--teal); color: var(--teal); background: #f0faf6; }
+
 /* Cards de produto - grade */
 .cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 1rem; }
+
+/* Modo lista: uma coluna, cards em linha horizontal */
+.cards.modo-lista { grid-template-columns: 1fr; gap: 0.6rem; }
+.cards.modo-lista .card {
+  flex-direction: row; align-items: center; text-align: left;
+  min-height: 0; padding: 0.7rem 1rem; gap: 1rem;
+}
+.cards.modo-lista .tipo-tag { position: static; order: 0; flex: none; }
+.cards.modo-lista .card-nome { position: static; order: 1; flex: 1; margin: 0; font-size: 1rem; }
+.cards.modo-lista .btn-acessar { position: static; order: 2; margin: 0; width: auto; padding: 0.5rem 1.3rem; }
+.cards.modo-lista .sem-link { position: static; order: 2; margin: 0; }
+.cards.modo-lista .card-acoes { position: static; order: 3; }
 .card {
   position: relative;
   display: flex;

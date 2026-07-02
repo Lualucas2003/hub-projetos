@@ -52,6 +52,23 @@ document.querySelectorAll(".menu-item").forEach((b) =>
   b.addEventListener("click", () => mostrarView(b.dataset.view))
 );
 
+// ---- Modo de visualizacao (cards / lista) ----
+const verCards = document.getElementById("ver-cards");
+const verLista = document.getElementById("ver-lista");
+
+function definirModo(modo) {
+  const ehLista = modo === "lista";
+  listaEl.classList.toggle("modo-lista", ehLista);
+  verLista.classList.toggle("ativo", ehLista);
+  verCards.classList.toggle("ativo", !ehLista);
+  try {
+    localStorage.setItem("modoVisual", modo);
+  } catch {}
+}
+verCards.addEventListener("click", () => definirModo("cards"));
+verLista.addEventListener("click", () => definirModo("lista"));
+definirModo(localStorage.getItem("modoVisual") || "cards");
+
 // ---- Helpers ----
 function escapar(txt = "") {
   return String(txt).replace(/[&<>"']/g, (c) =>
