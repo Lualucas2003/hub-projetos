@@ -429,6 +429,11 @@ function render(projetos) {
 
     card.querySelector(".editar").addEventListener("click", () => iniciarEdicao(p));
     card.querySelector(".excluir").addEventListener("click", () => excluir(p.id, p.nome));
+    card.style.cursor = "pointer";
+    card.addEventListener("click", (e) => {
+      if (e.target.closest(".btn-acessar") || e.target.closest(".acao")) return;
+      abrirDetalhes(p);
+    });
     listaEl.appendChild(card);
   }
 }
@@ -486,6 +491,11 @@ function renderAcessos() {
         el.textContent = revelada ? el.dataset.senha : "••••••••";
       });
     }
+    linha.style.cursor = "pointer";
+    linha.addEventListener("click", (e) => {
+      if (e.target.closest(".btn-acessar") || e.target.closest(".ver-senha")) return;
+      abrirDetalhes(p);
+    });
     listaAcessosEl.appendChild(linha);
   }
 }
@@ -494,6 +504,71 @@ let debounceAcessos;
 buscaAcessosEl.addEventListener("input", () => {
   clearTimeout(debounceAcessos);
   debounceAcessos = setTimeout(renderAcessos, 200);
+});
+
+// ---- Modal de detalhes (metadados preenchidos) ----
+const modalDetalhes = document.getElementById("modal-detalhes");
+const detTitulo = document.getElementById("det-titulo");
+const detConteudo = document.getElementById("det-conteudo");
+
+function formatarData(iso) {
+  if (!iso) return "";
+  const d = new Date(iso);
+  return isNaN(d.getTime()) ? "" : d.toLocaleString("pt-BR");
+}
+
+function abrirDetalhes(p) {
+  detTitulo.textContent = p.nome;
+  const linhas = [];
+  const add = (rot, val) => {
+    if (val) linhas.push(`<div class="det-linha"><span class="det-rot">${rot}</span><span class="det-val">${val}</span></div>`);
+  };
+
+  add("Tipo", p.tipo === "ficha" ? "Ficha" : "Painel");
+  add("Descricao", p.descricao ? escapar(p.descricao) : "");
+  add("Tema", p.tema ? escapar(p.tema) : "");
+  add("Programa", p.programa ? escapar(p.programa) : "");
+  if (p.url) {
+    linhas.push(
+      `<div class="det-linha"><span class="det-rot">Link de acesso</span><span class="det-val"><a href="${escapar(p.url)}" target="_blank" rel="noopener">${escapar(p.url)}</a></span></div>`
+    );
+  }
+  add("Login", p.login ? escapar(p.login) : "");
+  if (p.senha) {
+    linhas.push(
+      `<div class="det-linha"><span class="det-rot">Senha</span><span class="det-val det-senha"><span class="senha-txt senha" data-senha="${escapar(p.senha)}">••••••••</span><button type="button" class="ver-senha" title="Mostrar/ocultar">👁️</button></span></div>`
+    );
+  }
+  add("Criado em", formatarData(p.criadoEm));
+  add("Atualizado em", formatarData(p.atualizadoEm));
+
+  const img = p.imagem
+    ? `<div class="det-linha"><span class="det-rot">Imagem</span><img class="det-img" src="${escapar(p.imagem)}" alt="Imagem de ${escapar(p.nome)}" /></div>`
+    : "";
+
+  detConteudo.innerHTML = linhas.join("") + img;
+
+  const btnVer = detConteudo.querySelector(".ver-senha");
+  if (btnVer) {
+    btnVer.addEventListener("click", () => {
+      const el = detConteudo.querySelector(".senha-txt");
+      const revelada = el.classList.toggle("revelada");
+      el.textContent = revelada ? el.dataset.senha : "••••••••";
+    });
+  }
+
+  modalDetalhes.hidden = false;
+  document.body.style.overflow = "hidden";
+}
+
+function fecharDetalhes() {
+  modalDetalhes.hidden = true;
+  document.body.style.overflow = "";
+}
+document.getElementById("det-fechar").addEventListener("click", fecharDetalhes);
+modalDetalhes.querySelectorAll("[data-fechar-det]").forEach((el) => el.addEventListener("click", fecharDetalhes));
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape" && !modalDetalhes.hidden) fecharDetalhes();
 });
 
 // ---- Criar / Atualizar ----
