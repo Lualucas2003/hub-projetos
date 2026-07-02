@@ -8,7 +8,7 @@
   --teal: #0ea87d;
   --teal-forte: #0c9770;
   --azul: #2f7de0;
-  --acesso: #2f7de0;
+  --acesso: #1e3d5c;
   --roxo: #9b51e0;
   --realce: #f0faf6;
   --sombra: 0 4px 16px rgba(20, 25, 40, 0.08);
@@ -266,8 +266,8 @@ form input:focus, form textarea:focus, form select:focus {
   transition: box-shadow 0.15s, transform 0.1s;
 }
 .card:hover { box-shadow: var(--sombra); transform: translateY(-2px); }
-.card.painel { border-top-color: var(--acesso); }
-.card.ficha { border-top-color: var(--acesso); }
+.card.painel { border-top-color: var(--azul); }
+.card.ficha { border-top-color: var(--azul); }
 
 .tipo-tag {
   position: absolute; top: 0.6rem; left: 0.6rem;
