@@ -376,52 +376,50 @@ function render(projetos) {
   vazioEl.hidden = projetos.length > 0;
 
   for (const p of projetos) {
-    const card = document.createElement("div");
-    card.className = "card";
-    const link = p.url
-      ? `<a class="card-link" href="${escapar(p.url)}" target="_blank" rel="noopener">🔗 Abrir</a>`
-      : "<span></span>";
-
-    const rotuloTipo = p.tipo === "ficha" ? "Ficha" : "Painel";
-    const meta = [
-      `<span class="tipo-tag ${p.tipo === "ficha" ? "ficha" : "painel"}">${rotuloTipo}</span>`,
-      p.tema ? `<span class="meta-item">🎯 ${escapar(p.tema)}</span>` : "",
-      p.programa ? `<span class="meta-item">📌 ${escapar(p.programa)}</span>` : "",
-    ].join("");
+    const ehFicha = p.tipo === "ficha";
+    card.className = `card ${ehFicha ? "ficha" : "painel"}`;
+    const rotuloTipo = ehFicha ? "Ficha" : "Painel";
 
     const imagem = p.imagem
       ? `<img class="card-imagem" src="${escapar(p.imagem)}" alt="Imagem de ${escapar(p.nome)}" loading="lazy" />`
       : "";
 
-    const credenciais = [
-      p.login ? `<div class="cred"><span class="cred-rot">👤 Login</span><span class="cred-val">${escapar(p.login)}</span></div>` : "",
+    const linha = (rot, val) =>
+      `<div class="info-linha"><span class="info-rot">${rot}</span><span class="info-val">${escapar(val)}</span></div>`;
+
+    const infos = [
+      p.tema ? linha("Tema", p.tema) : "",
+      p.programa ? linha("Programa", p.programa) : "",
+      p.login ? linha("Login", p.login) : "",
       p.senha
-        ? `<div class="cred"><span class="cred-rot">🔑 Senha</span><span class="cred-val senha" data-senha="${escapar(p.senha)}">••••••••</span><button type="button" class="ver-senha" title="Mostrar/ocultar">👁️</button></div>`
+        ? `<div class="info-linha"><span class="info-rot">Senha</span><span class="info-val senha" data-senha="${escapar(p.senha)}">••••••••</span><button type="button" class="ver-senha" title="Mostrar/ocultar">👁️</button></div>`
         : "",
     ].join("");
 
+    const botaoAcessar = p.url
+      ? `<a class="btn-acessar" href="${escapar(p.url)}" target="_blank" rel="noopener">Acessar ${rotuloTipo}</a>`
+      : "";
+
     card.innerHTML = `
       ${imagem}
-      <div class="card-topo">
-        <h3 class="card-nome">${escapar(p.nome)}</h3>
-      </div>
-      ${meta ? `<div class="card-meta">${meta}</div>` : ""}
-      ${p.descricao ? `<p class="card-desc">${escapar(p.descricao)}</p>` : ""}
-      ${credenciais ? `<div class="card-cred">${credenciais}</div>` : ""}
-      <div class="card-rodape">
-        ${link}
+      <div class="card-cabecalho">
+        <span class="tipo-tag ${ehFicha ? "ficha" : "painel"}">${rotuloTipo}</span>
         <div class="card-acoes">
-          <button class="acao editar" data-id="${p.id}">✏️ Editar</button>
-          <button class="acao excluir" data-id="${p.id}">🗑️ Excluir</button>
+          <button class="acao editar" data-id="${p.id}" title="Editar">✏️</button>
+          <button class="acao excluir" data-id="${p.id}" title="Excluir">🗑️</button>
         </div>
-      </div>`;
+      </div>
+      <h3 class="card-nome">${escapar(p.nome)}</h3>
+      ${p.descricao ? `<p class="card-desc">${escapar(p.descricao)}</p>` : ""}
+      ${infos ? `<div class="card-infos">${infos}</div>` : ""}
+      ${botaoAcessar}`;
 
     card.querySelector(".editar").addEventListener("click", () => iniciarEdicao(p));
     card.querySelector(".excluir").addEventListener("click", () => excluir(p.id, p.nome));
     const btnVer = card.querySelector(".ver-senha");
     if (btnVer) {
       btnVer.addEventListener("click", () => {
-        const el = card.querySelector(".cred-val.senha");
+        const el = card.querySelector(".info-val.senha");
         const revelada = el.classList.toggle("revelada");
         el.textContent = revelada ? el.dataset.senha : "••••••••";
       });
