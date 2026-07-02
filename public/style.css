@@ -113,6 +113,16 @@ form input:focus, form textarea:focus, form select:focus {
 .btn-primario:hover { filter: brightness(1.08); }
 .btn-neutro { background: #ececec; color: var(--cinza-texto); }
 
+/* Barra de importacao */
+.barra-importar { display: flex; align-items: center; gap: 0.8rem; margin-bottom: 0.9rem; flex-wrap: wrap; }
+.btn-importar { display: inline-flex; align-items: center; gap: 0.3rem; cursor: pointer; }
+.link-modelo {
+  background: none; border: none; padding: 0; cursor: pointer;
+  color: var(--vermelho); font-weight: 600; font-size: 0.85rem; text-decoration: underline;
+  font-family: inherit;
+}
+.link-modelo:hover { color: var(--vermelho-escuro); }
+
 /* Barra de busca */
 .barra-busca { display: flex; flex-wrap: wrap; gap: 0.7rem; margin-bottom: 1.1rem; }
 .barra-busca input { flex: 1 1 220px; padding: 0.6rem 0.8rem; border: 2px solid #e6e6e6; border-radius: 8px; font-size: 0.95rem; }

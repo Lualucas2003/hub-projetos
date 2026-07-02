@@ -6,6 +6,7 @@ Sistema web para **cadastrar, organizar e acompanhar projetos**. Tema visual em 
 - Cadastrar, editar e excluir projetos
 - Tema, programa, tags, descricao e link do repositorio
 - Imagem por projeto (enviada e armazenada em base64)
+- Importacao em lote via CSV (com modelo para baixar)
 - Busca por nome/descricao/tema/programa/tag
 - Filtros por tema e programa
 - Ordenacao (recentes, antigos, nome, tema, programa, mais tags)
@@ -56,6 +57,7 @@ Acesse: http://localhost:3000
 |--------|------|-----------|
 | GET | `/api/projetos?busca=&tema=&programa=&ordenar=` | Lista projetos |
 | POST | `/api/projetos` | Cria projeto |
+| POST | `/api/projetos/importar` | Importa varios projetos em lote (`{ projetos: [...] }`) |
 | PUT | `/api/projetos/:id` | Atualiza projeto |
 | DELETE | `/api/projetos/:id` | Exclui projeto |
 | GET | `/api/opcoes` | Temas e programas cadastrados (p/ filtros) |

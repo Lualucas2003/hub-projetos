@@ -81,6 +81,124 @@ btnRemoverImagem.addEventListener("click", () => {
   mostrarPrevia("");
 });
 
+// ---- Importacao CSV ----
+const csvArquivoEl = document.getElementById("csv-arquivo");
+const btnBaixarModelo = document.getElementById("baixar-modelo");
+
+// Parser de CSV com suporte a campos entre aspas (que podem conter , e quebras de linha)
+function parseCSV(texto) {
+  const linhas = [];
+  let campo = "";
+  let linha = [];
+  let dentroAspas = false;
+  for (let i = 0; i < texto.length; i++) {
+    const c = texto[i];
+    if (dentroAspas) {
+      if (c === '"') {
+        if (texto[i + 1] === '"') { campo += '"'; i++; }
+        else dentroAspas = false;
+      } else {
+        campo += c;
+      }
+    } else if (c === '"') {
+      dentroAspas = true;
+    } else if (c === ",") {
+      linha.push(campo); campo = "";
+    } else if (c === "\r") {
+      // ignora
+    } else if (c === "\n") {
+      linha.push(campo); linhas.push(linha); linha = []; campo = "";
+    } else {
+      campo += c;
+    }
+  }
+  if (campo.length || linha.length) { linha.push(campo); linhas.push(linha); }
+  return linhas;
+}
+
+const DIACRITICOS = new RegExp("[\\u0300-\\u036f]", "g");
+function semAcento(s) {
+  return s.normalize("NFD").replace(DIACRITICOS, "");
+}
+
+// Converte as linhas do CSV em objetos de projeto usando o cabecalho
+function csvParaProjetos(texto) {
+  const linhas = parseCSV(texto).filter((l) => l.some((c) => c.trim() !== ""));
+  if (!linhas.length) return [];
+
+  const cabecalho = linhas[0].map((h) => semAcento(h.trim().toLowerCase()));
+  const idx = (nome) => cabecalho.indexOf(nome);
+  const iNome = idx("nome");
+  const iDesc = idx("descricao");
+  const iTema = idx("tema");
+  const iProg = idx("programa");
+  const iTags = idx("tags");
+  const iUrl = idx("url");
+
+  if (iNome === -1) {
+    throw new Error('O CSV precisa ter uma coluna "nome" no cabecalho.');
+  }
+
+  const val = (l, i) => (i >= 0 && i < l.length ? l[i].trim() : "");
+  return linhas.slice(1).map((l) => ({
+    nome: val(l, iNome),
+    descricao: val(l, iDesc),
+    tema: val(l, iTema),
+    programa: val(l, iProg),
+    // tags separadas por ; ou , dentro da celula
+    tags: val(l, iTags).split(/[;,]/).map((t) => t.trim()).filter(Boolean),
+    url: val(l, iUrl),
+  }));
+}
+
+csvArquivoEl.addEventListener("change", async () => {
+  const arquivo = csvArquivoEl.files[0];
+  if (!arquivo) return;
+  try {
+    const texto = await arquivo.text();
+    const projetos = csvParaProjetos(texto);
+    const validos = projetos.filter((p) => p.nome);
+    if (!validos.length) {
+      alert("Nenhum projeto valido encontrado no CSV (verifique a coluna 'nome').");
+      return;
+    }
+    if (!confirm(`Importar ${validos.length} projeto(s) do arquivo?`)) return;
+
+    const res = await fetch(`${API}/importar`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ projetos: validos }),
+    });
+    const r = await res.json().catch(() => ({}));
+    if (!res.ok) {
+      alert(r.erro || "Erro ao importar o CSV.");
+      return;
+    }
+    let msg = `${r.inseridos} projeto(s) importado(s).`;
+    if (r.ignorados) msg += ` ${r.ignorados} linha(s) ignorada(s) (sem nome).`;
+    alert(msg);
+    carregar();
+  } catch (e) {
+    alert(e.message || "Nao foi possivel ler o CSV.");
+  } finally {
+    csvArquivoEl.value = "";
+  }
+});
+
+// Gera e baixa um CSV de exemplo
+btnBaixarModelo.addEventListener("click", () => {
+  const modelo =
+    "nome,descricao,tema,programa,tags,url\n" +
+    'Portal do Cidadao,Servicos online da prefeitura,Educacao,Programa Jovem,web;react,https://exemplo.gov\n' +
+    'App Saude,Agendamento de consultas,Saude,Programa Bem-Estar,mobile;flutter,\n';
+  const blob = new Blob([modelo], { type: "text/csv;charset=utf-8" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = "modelo-projetos.csv";
+  a.click();
+  URL.revokeObjectURL(a.href);
+});
+
 // ---- Modal de edicao ----
 const modal = document.getElementById("modal-editar");
 const formEditar = document.getElementById("form-editar");

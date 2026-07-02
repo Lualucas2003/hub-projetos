@@ -139,6 +139,50 @@ app.post("/api/projetos", async (req, res) => {
   }
 });
 
+// Importar em lote (varios projetos de uma vez, ex.: vindos de CSV)
+app.post("/api/projetos/importar", async (req, res) => {
+  const lista = Array.isArray(req.body?.projetos) ? req.body.projetos : [];
+  if (!lista.length) {
+    return res.status(400).json({ erro: "Nenhum projeto para importar." });
+  }
+
+  const cliente = await pool.connect();
+  let inseridos = 0;
+  const erros = [];
+  try {
+    await cliente.query("BEGIN");
+    for (let i = 0; i < lista.length; i++) {
+      const p = lista[i] || {};
+      const nome = String(p.nome || "").trim();
+      if (!nome) {
+        erros.push({ linha: i + 1, erro: "nome vazio" });
+        continue;
+      }
+      await cliente.query(
+        `INSERT INTO projetos (nome, descricao, tema, programa, tags, url)
+         VALUES ($1, $2, $3, $4, $5, $6)`,
+        [
+          nome,
+          String(p.descricao || "").trim(),
+          String(p.tema || "").trim(),
+          String(p.programa || "").trim(),
+          normalizarTags(p.tags),
+          String(p.url || "").trim(),
+        ]
+      );
+      inseridos++;
+    }
+    await cliente.query("COMMIT");
+    res.status(201).json({ inseridos, ignorados: erros.length, erros });
+  } catch (e) {
+    await cliente.query("ROLLBACK").catch(() => {});
+    console.error("Erro ao importar projetos:", e.message);
+    res.status(500).json({ erro: "Erro ao importar projetos." });
+  } finally {
+    cliente.release();
+  }
+});
+
 // Atualizar
 app.put("/api/projetos/:id", async (req, res) => {
   try {
