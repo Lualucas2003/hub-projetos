@@ -38,6 +38,12 @@
           <label>Produto *
             <input type="text" id="nome" placeholder="Ex: Eleitoral, Saude, Educacao..." required />
           </label>
+          <label>Tipo
+            <select id="tipo">
+              <option value="painel">Painel</option>
+              <option value="ficha">Ficha</option>
+            </select>
+          </label>
           <label>Descricao
             <textarea id="descricao" rows="3" placeholder="Sobre o que e este produto..."></textarea>
           </label>
@@ -75,6 +81,8 @@
     <section id="view-acessos" class="view">
       <section class="stats" id="stats">
         <div class="stat-card"><span class="stat-num" id="stat-total">0</span><span class="stat-label">Total de Produtos</span></div>
+        <div class="stat-card azul"><span class="stat-num" id="stat-paineis">0</span><span class="stat-label">Total de Paineis</span></div>
+        <div class="stat-card roxo"><span class="stat-num" id="stat-fichas">0</span><span class="stat-label">Total de Fichas</span></div>
       </section>
 
       <section class="painel lista">
@@ -122,6 +130,12 @@
         <input type="hidden" id="e-id" />
         <label>Produto *
           <input type="text" id="e-nome" required />
+        </label>
+        <label>Tipo
+          <select id="e-tipo">
+            <option value="painel">Painel</option>
+            <option value="ficha">Ficha</option>
+          </select>
         </label>
         <label>Descricao
           <textarea id="e-descricao" rows="3"></textarea>

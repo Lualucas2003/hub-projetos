@@ -18,6 +18,11 @@ function normalizarImagem(imagem) {
   return v;
 }
 
+// Aceita apenas os tipos validos; qualquer outro vira "painel"
+function normalizarTipo(tipo) {
+  return String(tipo).trim().toLowerCase() === "ficha" ? "ficha" : "painel";
+}
+
 // Mapeia a opcao de ordenacao para uma clausula ORDER BY segura (whitelist)
 const ORDENACOES = {
   recentes: "criado_em DESC",
@@ -98,6 +103,7 @@ app.post("/api/projetos", async (req, res) => {
       nome,
       descricao = "",
       status = "ativo",
+      tipo = "painel",
       url = "",
       tema = "",
       programa = "",
@@ -109,13 +115,14 @@ app.post("/api/projetos", async (req, res) => {
       return res.status(400).json({ erro: "O nome do produto e obrigatorio." });
     }
     const { rows } = await pool.query(
-      `INSERT INTO projetos (nome, descricao, status, tema, programa, url, login, senha, imagem)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
+      `INSERT INTO projetos (nome, descricao, status, tipo, tema, programa, url, login, senha, imagem)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
        RETURNING *`,
       [
         String(nome).trim(),
         String(descricao).trim(),
         status,
+        normalizarTipo(tipo),
         String(tema).trim(),
         String(programa).trim(),
         String(url).trim(),
@@ -151,11 +158,12 @@ app.post("/api/projetos/importar", async (req, res) => {
         continue;
       }
       await cliente.query(
-        `INSERT INTO projetos (nome, descricao, tema, programa, url, login, senha)
-         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        `INSERT INTO projetos (nome, descricao, tipo, tema, programa, url, login, senha)
+         VALUES ($1, $2, $3, $4, $5, $6, $7, $8)`,
         [
           nome,
           String(p.descricao || "").trim(),
+          normalizarTipo(p.tipo || "painel"),
           String(p.tema || "").trim(),
           String(p.programa || "").trim(),
           String(p.url || "").trim(),
@@ -179,7 +187,7 @@ app.post("/api/projetos/importar", async (req, res) => {
 // Atualizar
 app.put("/api/projetos/:id", async (req, res) => {
   try {
-    const { nome, descricao, status, url, tema, programa, login, senha, imagem } = req.body || {};
+    const { nome, descricao, status, tipo, url, tema, programa, login, senha, imagem } = req.body || {};
 
     // Monta atualizacao dinamica apenas com os campos enviados
     const campos = [];
@@ -192,6 +200,7 @@ app.put("/api/projetos/:id", async (req, res) => {
     if (nome !== undefined && String(nome).trim()) set("nome", String(nome).trim());
     if (descricao !== undefined) set("descricao", String(descricao).trim());
     if (status !== undefined) set("status", status);
+    if (tipo !== undefined) set("tipo", normalizarTipo(tipo));
     if (tema !== undefined) set("tema", String(tema).trim());
     if (programa !== undefined) set("programa", String(programa).trim());
     if (url !== undefined) set("url", String(url).trim());
@@ -235,9 +244,8 @@ app.get("/api/stats", async (_req, res) => {
     const { rows } = await pool.query(`
       SELECT
         COUNT(*)::int AS total,
-        COUNT(*) FILTER (WHERE status = 'ativo')::int AS ativos,
-        COUNT(*) FILTER (WHERE status = 'concluido')::int AS concluidos,
-        COUNT(*) FILTER (WHERE status = 'pausado')::int AS pausados
+        COUNT(*) FILTER (WHERE tipo = 'painel')::int AS paineis,
+        COUNT(*) FILTER (WHERE tipo = 'ficha')::int AS fichas
       FROM projetos
     `);
     res.json(rows[0]);

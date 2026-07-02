@@ -22,6 +22,7 @@ export async function inicializarBanco() {
       nome        TEXT NOT NULL,
       descricao   TEXT NOT NULL DEFAULT '',
       status      TEXT NOT NULL DEFAULT 'ativo',
+      tipo        TEXT NOT NULL DEFAULT 'painel',
       tema        TEXT NOT NULL DEFAULT '',
       programa    TEXT NOT NULL DEFAULT '',
       tags        TEXT[] NOT NULL DEFAULT '{}',
@@ -38,6 +39,7 @@ export async function inicializarBanco() {
   await pool.query(`ALTER TABLE projetos ADD COLUMN IF NOT EXISTS imagem TEXT NOT NULL DEFAULT '';`);
   await pool.query(`ALTER TABLE projetos ADD COLUMN IF NOT EXISTS login TEXT NOT NULL DEFAULT '';`);
   await pool.query(`ALTER TABLE projetos ADD COLUMN IF NOT EXISTS senha TEXT NOT NULL DEFAULT '';`);
+  await pool.query(`ALTER TABLE projetos ADD COLUMN IF NOT EXISTS tipo TEXT NOT NULL DEFAULT 'painel';`);
 
   // Indices para acelerar filtros e ordenacao
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_projetos_status ON projetos (status);`);
@@ -53,6 +55,7 @@ export function mapearProjeto(row) {
     nome: row.nome,
     descricao: row.descricao,
     status: row.status,
+    tipo: row.tipo || "painel",
     tema: row.tema,
     programa: row.programa,
     url: row.url,

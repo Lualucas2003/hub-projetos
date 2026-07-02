@@ -95,7 +95,11 @@ body {
   text-align: center;
   box-shadow: var(--sombra);
 }
+.stat-card.azul { border-top-color: var(--azul); }
+.stat-card.roxo { border-top-color: var(--roxo); }
 .stat-num { display: block; font-size: 2rem; font-weight: 800; color: var(--teal); }
+.stat-card.azul .stat-num { color: var(--azul); }
+.stat-card.roxo .stat-num { color: var(--roxo); }
 .stat-label {
   font-size: 0.78rem; text-transform: uppercase; letter-spacing: 1px;
   color: var(--suave); font-family: var(--mono);
@@ -215,8 +219,14 @@ form input:focus, form textarea:focus, form select:focus {
 .card-topo { display: flex; justify-content: space-between; align-items: start; gap: 0.5rem; }
 .card-nome { font-size: 1.15rem; color: var(--texto); }
 
-.card-meta { display: flex; flex-wrap: wrap; gap: 0.4rem 0.9rem; margin-top: 0.4rem; }
+.card-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 0.4rem 0.9rem; margin-top: 0.4rem; }
 .meta-item { font-size: 0.75rem; font-weight: 600; color: var(--suave); font-family: var(--mono); text-transform: uppercase; letter-spacing: 0.5px; }
+.tipo-tag {
+  font-size: 0.68rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
+  padding: 0.15rem 0.5rem; border-radius: 20px; font-family: var(--mono);
+}
+.tipo-tag.painel { background: rgba(47, 125, 224, 0.12); color: var(--azul); }
+.tipo-tag.ficha { background: rgba(155, 81, 224, 0.12); color: var(--roxo); }
 
 .card-desc { margin: 0.5rem 0; color: #545b6b; font-size: 0.92rem; }
 

@@ -299,6 +299,7 @@ formEditar.addEventListener("submit", async (e) => {
   const id = document.getElementById("e-id").value;
   const dados = {
     nome: document.getElementById("e-nome").value,
+    tipo: document.getElementById("e-tipo").value,
     descricao: document.getElementById("e-descricao").value,
     tema: document.getElementById("e-tema").value,
     programa: document.getElementById("e-programa").value,
@@ -365,6 +366,8 @@ async function atualizarStats() {
   const res = await fetch("/api/stats");
   const s = await res.json();
   document.getElementById("stat-total").textContent = s.total;
+  document.getElementById("stat-paineis").textContent = s.paineis;
+  document.getElementById("stat-fichas").textContent = s.fichas;
 }
 
 // ---- Render ----
@@ -379,7 +382,9 @@ function render(projetos) {
       ? `<a class="card-link" href="${escapar(p.url)}" target="_blank" rel="noopener">🔗 Abrir</a>`
       : "<span></span>";
 
+    const rotuloTipo = p.tipo === "ficha" ? "Ficha" : "Painel";
     const meta = [
+      `<span class="tipo-tag ${p.tipo === "ficha" ? "ficha" : "painel"}">${rotuloTipo}</span>`,
       p.tema ? `<span class="meta-item">🎯 ${escapar(p.tema)}</span>` : "",
       p.programa ? `<span class="meta-item">📌 ${escapar(p.programa)}</span>` : "",
     ].join("");
@@ -430,6 +435,7 @@ form.addEventListener("submit", async (e) => {
   e.preventDefault();
   const dados = {
     nome: document.getElementById("nome").value,
+    tipo: document.getElementById("tipo").value,
     descricao: document.getElementById("descricao").value,
     tema: document.getElementById("tema").value,
     programa: document.getElementById("programa").value,
@@ -472,6 +478,7 @@ form.addEventListener("submit", async (e) => {
 function iniciarEdicao(p) {
   document.getElementById("e-id").value = p.id;
   document.getElementById("e-nome").value = p.nome;
+  document.getElementById("e-tipo").value = p.tipo || "painel";
   document.getElementById("e-descricao").value = p.descricao || "";
   document.getElementById("e-tema").value = p.tema || "";
   document.getElementById("e-programa").value = p.programa || "";
