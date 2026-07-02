@@ -8,6 +8,7 @@
   --teal: #0ea87d;
   --teal-forte: #0c9770;
   --azul: #2f7de0;
+  --acesso: #1e3d5c;
   --roxo: #9b51e0;
   --realce: #f0faf6;
   --sombra: 0 4px 16px rgba(20, 25, 40, 0.08);
@@ -289,7 +290,7 @@ form input:focus, form textarea:focus, form select:focus {
   display: block;
   width: 100%;
   text-align: center;
-  background: var(--azul);
+  background: var(--acesso);
   color: #fff;
   font-weight: 700;
   font-size: 0.9rem;
@@ -299,7 +300,7 @@ form input:focus, form textarea:focus, form select:focus {
   text-decoration: none;
   transition: background 0.15s, filter 0.15s;
 }
-.btn-acessar:hover { filter: brightness(0.92); }
+.btn-acessar:hover { filter: brightness(1.15); }
 
 /* Acoes (editar / excluir) - canto superior direito */
 .card-acoes { position: absolute; top: 0.6rem; right: 0.6rem; display: flex; gap: 0.3rem; }
@@ -319,12 +320,14 @@ form input:focus, form textarea:focus, form select:focus {
 .vazio { text-align: center; padding: 2rem; color: var(--suave); }
 
 /* Modal de detalhes (metadados) */
+#modal-detalhes .modal-caixa { border-top-color: var(--acesso); }
 .detalhes { display: flex; flex-direction: column; gap: 0.7rem; }
 .det-linha { display: flex; flex-direction: column; gap: 0.15rem; }
-.det-rot { font-family: var(--mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--suave); }
+.det-rot { font-family: var(--mono); font-size: 0.66rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--acesso); }
 .det-val { color: var(--texto); font-weight: 600; word-break: break-word; }
-.det-val a { color: var(--teal); text-decoration: none; }
+.det-val a { color: var(--acesso); text-decoration: none; }
 .det-val a:hover { text-decoration: underline; }
+#modal-detalhes .modal-topo h2 { color: var(--acesso); }
 .det-senha { display: inline-flex; align-items: center; gap: 0.5rem; }
 .senha-txt.senha { font-family: var(--mono); letter-spacing: 1px; }
 .det-img { width: 100%; max-height: 220px; object-fit: cover; border-radius: 8px; border: 1px solid var(--borda); margin-top: 0.2rem; }
