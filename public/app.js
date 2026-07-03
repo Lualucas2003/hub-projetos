@@ -522,27 +522,56 @@ modalDetalhes.querySelectorAll("[data-fechar-det]").forEach((el) => el.addEventL
 
 // ---- Visualizador de PDF (abre no sistema, sem baixar) ----
 const modalPdf = document.getElementById("modal-pdf");
-const pdfFrame = document.getElementById("pdf-frame");
+const pdfContainer = document.getElementById("pdf-container");
 const pdfTitulo = document.getElementById("pdf-titulo");
 const pdfBaixar = document.getElementById("pdf-baixar");
+let pdfRenderToken = 0; // cancela renderizacoes antigas
 
-// Abre o PDF servido pelo backend (inline, sem baixar)
-function abrirPdf(produto, indice = 0) {
+if (window.pdfjsLib) {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = "vendor/pdf.worker.min.js";
+}
+
+// Abre o PDF renderizando com PDF.js (canvas) - nao depende do visualizador do navegador,
+// entao nunca baixa; o usuario final ve o documento na tela.
+async function abrirPdf(produto, indice = 0) {
   const anexo = produto && Array.isArray(produto.anexos) ? produto.anexos[indice] : null;
   if (!anexo) return;
   const url = `/api/projetos/${produto.id}/anexos/${indice}`;
+
   pdfTitulo.textContent = anexo.nome || "Documento";
   pdfBaixar.href = url;
   pdfBaixar.download = anexo.nome || "documento.pdf";
-  // Mostra o modal ANTES de apontar o iframe (senao o leitor de PDF nao carrega)
   modalPdf.hidden = false;
   document.body.style.overflow = "hidden";
-  pdfFrame.src = url;
+  pdfContainer.innerHTML = '<p class="pdf-status">Carregando documento...</p>';
+
+  const token = ++pdfRenderToken;
+  try {
+    const pdf = await pdfjsLib.getDocument(url).promise;
+    if (token !== pdfRenderToken) return; // outro PDF foi aberto
+    pdfContainer.innerHTML = "";
+    for (let n = 1; n <= pdf.numPages; n++) {
+      const page = await pdf.getPage(n);
+      if (token !== pdfRenderToken) return;
+      const viewport = page.getViewport({ scale: 1.4 });
+      const canvas = document.createElement("canvas");
+      canvas.className = "pdf-pagina";
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      pdfContainer.appendChild(canvas);
+      await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
+    }
+  } catch (e) {
+    if (token === pdfRenderToken) {
+      pdfContainer.innerHTML = '<p class="pdf-status">Nao foi possivel exibir o PDF. Use "Baixar".</p>';
+    }
+  }
 }
 
 function fecharPdf() {
+  pdfRenderToken++; // cancela render em andamento
   modalPdf.hidden = true;
-  pdfFrame.src = "about:blank";
+  pdfContainer.innerHTML = "";
   if (modalDetalhes.hidden) document.body.style.overflow = "";
 }
 document.getElementById("pdf-fechar").addEventListener("click", fecharPdf);
