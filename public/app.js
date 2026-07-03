@@ -368,7 +368,7 @@ function render(projetos) {
     if (btnPdf) {
       btnPdf.addEventListener("click", (e) => {
         e.stopPropagation();
-        abrirPdf(p.anexos[0]);
+        abrirPdf(p, 0);
       });
     }
     card.style.cursor = "pointer";
@@ -506,7 +506,7 @@ function abrirDetalhes(p) {
     });
   }
   detConteudo.querySelectorAll(".det-anexo").forEach((b) =>
-    b.addEventListener("click", () => abrirPdf(p.anexos[Number(b.dataset.i)]))
+    b.addEventListener("click", () => abrirPdf(p, Number(b.dataset.i)))
   );
 
   modalDetalhes.hidden = false;
@@ -525,34 +525,24 @@ const modalPdf = document.getElementById("modal-pdf");
 const pdfFrame = document.getElementById("pdf-frame");
 const pdfTitulo = document.getElementById("pdf-titulo");
 const pdfBaixar = document.getElementById("pdf-baixar");
-let pdfUrlAtual = null;
 
-async function abrirPdf(anexo) {
-  if (!anexo || !anexo.dados) return;
-  try {
-    // Converte o data URL (base64) em Blob URL para exibir inline no iframe
-    const blob = await (await fetch(anexo.dados)).blob();
-    if (pdfUrlAtual) URL.revokeObjectURL(pdfUrlAtual);
-    pdfUrlAtual = URL.createObjectURL(blob);
-    pdfTitulo.textContent = anexo.nome || "Documento";
-    pdfBaixar.href = pdfUrlAtual;
-    pdfBaixar.download = anexo.nome || "documento.pdf";
-    // Mostra o modal ANTES de apontar o iframe (senao o leitor de PDF nao carrega)
-    modalPdf.hidden = false;
-    document.body.style.overflow = "hidden";
-    pdfFrame.src = pdfUrlAtual;
-  } catch {
-    alert("Nao foi possivel abrir o PDF.");
-  }
+// Abre o PDF servido pelo backend (inline, sem baixar)
+function abrirPdf(produto, indice = 0) {
+  const anexo = produto && Array.isArray(produto.anexos) ? produto.anexos[indice] : null;
+  if (!anexo) return;
+  const url = `/api/projetos/${produto.id}/anexos/${indice}`;
+  pdfTitulo.textContent = anexo.nome || "Documento";
+  pdfBaixar.href = url;
+  pdfBaixar.download = anexo.nome || "documento.pdf";
+  // Mostra o modal ANTES de apontar o iframe (senao o leitor de PDF nao carrega)
+  modalPdf.hidden = false;
+  document.body.style.overflow = "hidden";
+  pdfFrame.src = url;
 }
 
 function fecharPdf() {
   modalPdf.hidden = true;
   pdfFrame.src = "about:blank";
-  if (pdfUrlAtual) {
-    URL.revokeObjectURL(pdfUrlAtual);
-    pdfUrlAtual = null;
-  }
   if (modalDetalhes.hidden) document.body.style.overflow = "";
 }
 document.getElementById("pdf-fechar").addEventListener("click", fecharPdf);

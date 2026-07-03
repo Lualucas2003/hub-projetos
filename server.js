@@ -259,6 +259,27 @@ app.delete("/api/projetos/:id", async (req, res) => {
   }
 });
 
+// Servir um anexo PDF inline (o navegador exibe sem baixar)
+app.get("/api/projetos/:id/anexos/:idx", async (req, res) => {
+  try {
+    const { rows } = await pool.query(`SELECT anexos FROM projetos WHERE id = $1`, [req.params.id]);
+    if (!rows.length) return res.status(404).send("Produto nao encontrado.");
+    const anexos = Array.isArray(rows[0].anexos) ? rows[0].anexos : [];
+    const anexo = anexos[Number(req.params.idx)];
+    if (!anexo || typeof anexo.dados !== "string" || !/^data:application\/pdf;base64,/.test(anexo.dados)) {
+      return res.status(404).send("Anexo nao encontrado.");
+    }
+    const buffer = Buffer.from(anexo.dados.split(",")[1] || "", "base64");
+    const nome = encodeURIComponent(anexo.nome || "documento.pdf");
+    res.setHeader("Content-Type", "application/pdf");
+    res.setHeader("Content-Disposition", `inline; filename="${nome}"`);
+    res.send(buffer);
+  } catch (e) {
+    console.error("Erro ao servir anexo:", e.message);
+    res.status(500).send("Erro ao abrir o anexo.");
+  }
+});
+
 // Estatisticas
 app.get("/api/stats", async (_req, res) => {
   try {
