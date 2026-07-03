@@ -210,12 +210,25 @@ form input:focus, form textarea:focus, form select:focus {
 .anexo-remover:hover { color: #e5484d; }
 
 /* Anexos no modal de detalhes */
-.det-anexos { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.2rem; }
+.det-anexos { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.2rem; align-items: flex-start; }
 .det-anexo {
-  display: inline-block; color: var(--acesso); text-decoration: none; font-weight: 600;
-  font-size: 0.9rem;
+  background: none; border: none; padding: 0; cursor: pointer; text-align: left;
+  color: var(--acesso); font-weight: 600; font-size: 0.9rem; font-family: inherit;
 }
 .det-anexo:hover { text-decoration: underline; }
+
+/* Visualizador de PDF */
+#modal-pdf { z-index: 110; }
+.modal-caixa-pdf {
+  width: min(950px, 100%);
+  height: 88vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+}
+.pdf-acoes { display: flex; align-items: center; gap: 0.6rem; }
+#pdf-baixar { text-decoration: none; }
+.pdf-frame { flex: 1; width: 100%; border: 1px solid var(--borda); border-radius: 8px; background: #fff; }
 
 .btn {
   border: none;

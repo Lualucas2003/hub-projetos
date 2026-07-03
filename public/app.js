@@ -479,8 +479,8 @@ function abrirDetalhes(p) {
   const anexos = Array.isArray(p.anexos) && p.anexos.length
     ? `<div class="det-linha"><span class="det-rot">Documentos (PDF)</span><div class="det-anexos">${p.anexos
         .map(
-          (a) =>
-            `<a class="det-anexo" href="${escapar(a.dados)}" download="${escapar(a.nome)}" target="_blank" rel="noopener">📄 ${escapar(a.nome)}</a>`
+          (a, i) =>
+            `<button type="button" class="det-anexo" data-i="${i}">📄 ${escapar(a.nome)}</button>`
         )
         .join("")}</div></div>`
     : "";
@@ -495,6 +495,9 @@ function abrirDetalhes(p) {
       el.textContent = revelada ? el.dataset.senha : "••••••••";
     });
   }
+  detConteudo.querySelectorAll(".det-anexo").forEach((b) =>
+    b.addEventListener("click", () => abrirPdf(p.anexos[Number(b.dataset.i)]))
+  );
 
   modalDetalhes.hidden = false;
   document.body.style.overflow = "hidden";
@@ -506,8 +509,49 @@ function fecharDetalhes() {
 }
 document.getElementById("det-fechar").addEventListener("click", fecharDetalhes);
 modalDetalhes.querySelectorAll("[data-fechar-det]").forEach((el) => el.addEventListener("click", fecharDetalhes));
+
+// ---- Visualizador de PDF (abre no sistema, sem baixar) ----
+const modalPdf = document.getElementById("modal-pdf");
+const pdfFrame = document.getElementById("pdf-frame");
+const pdfTitulo = document.getElementById("pdf-titulo");
+const pdfBaixar = document.getElementById("pdf-baixar");
+let pdfUrlAtual = null;
+
+async function abrirPdf(anexo) {
+  if (!anexo || !anexo.dados) return;
+  try {
+    // Converte o data URL (base64) em Blob URL para exibir inline no iframe
+    const blob = await (await fetch(anexo.dados)).blob();
+    if (pdfUrlAtual) URL.revokeObjectURL(pdfUrlAtual);
+    pdfUrlAtual = URL.createObjectURL(blob);
+    pdfFrame.src = pdfUrlAtual;
+    pdfTitulo.textContent = anexo.nome || "Documento";
+    pdfBaixar.href = pdfUrlAtual;
+    pdfBaixar.download = anexo.nome || "documento.pdf";
+    modalPdf.hidden = false;
+    document.body.style.overflow = "hidden";
+  } catch {
+    alert("Nao foi possivel abrir o PDF.");
+  }
+}
+
+function fecharPdf() {
+  modalPdf.hidden = true;
+  pdfFrame.src = "about:blank";
+  if (pdfUrlAtual) {
+    URL.revokeObjectURL(pdfUrlAtual);
+    pdfUrlAtual = null;
+  }
+  if (modalDetalhes.hidden) document.body.style.overflow = "";
+}
+document.getElementById("pdf-fechar").addEventListener("click", fecharPdf);
+modalPdf.querySelectorAll("[data-fechar-pdf]").forEach((el) => el.addEventListener("click", fecharPdf));
+
+// Esc fecha o topo primeiro (PDF), senao os detalhes
 document.addEventListener("keydown", (e) => {
-  if (e.key === "Escape" && !modalDetalhes.hidden) fecharDetalhes();
+  if (e.key !== "Escape") return;
+  if (!modalPdf.hidden) fecharPdf();
+  else if (!modalDetalhes.hidden) fecharDetalhes();
 });
 
 // ---- Criar / Atualizar ----
@@ -527,10 +571,6 @@ form.addEventListener("submit", async (e) => {
   };
   if (!dados.nome.trim()) {
     alert("Informe o produto.");
-    return;
-  }
-  if (!dados.url.trim()) {
-    alert("Informe o link de acesso.");
     return;
   }
 
