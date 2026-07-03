@@ -346,9 +346,12 @@ function render(projetos) {
     const ehFicha = p.tipo === "ficha";
     card.className = `card ${ehFicha ? "ficha" : "painel"}`;
 
-    const botaoAcessar = p.url
+    const temPdf = Array.isArray(p.anexos) && p.anexos.length > 0;
+    const botaoAcessar = temPdf
+      ? `<button type="button" class="btn-acessar acessar-pdf">ACESSO</button>`
+      : p.url
       ? `<a class="btn-acessar" href="${escapar(p.url)}" target="_blank" rel="noopener">ACESSO</a>`
-      : `<span class="sem-link">Sem link cadastrado</span>`;
+      : `<span class="sem-link">Sem acesso cadastrado</span>`;
 
     card.innerHTML = `
       <span class="tipo-tag ${ehFicha ? "ficha" : "painel"}">${ehFicha ? "Ficha" : "Painel"}</span>
@@ -361,6 +364,13 @@ function render(projetos) {
 
     card.querySelector(".editar").addEventListener("click", () => iniciarEdicao(p));
     card.querySelector(".excluir").addEventListener("click", () => excluir(p.id, p.nome));
+    const btnPdf = card.querySelector(".acessar-pdf");
+    if (btnPdf) {
+      btnPdf.addEventListener("click", (e) => {
+        e.stopPropagation();
+        abrirPdf(p.anexos[0]);
+      });
+    }
     card.style.cursor = "pointer";
     card.addEventListener("click", (e) => {
       if (e.target.closest(".btn-acessar") || e.target.closest(".acao")) return;
@@ -524,12 +534,13 @@ async function abrirPdf(anexo) {
     const blob = await (await fetch(anexo.dados)).blob();
     if (pdfUrlAtual) URL.revokeObjectURL(pdfUrlAtual);
     pdfUrlAtual = URL.createObjectURL(blob);
-    pdfFrame.src = pdfUrlAtual;
     pdfTitulo.textContent = anexo.nome || "Documento";
     pdfBaixar.href = pdfUrlAtual;
     pdfBaixar.download = anexo.nome || "documento.pdf";
+    // Mostra o modal ANTES de apontar o iframe (senao o leitor de PDF nao carrega)
     modalPdf.hidden = false;
     document.body.style.overflow = "hidden";
+    pdfFrame.src = pdfUrlAtual;
   } catch {
     alert("Nao foi possivel abrir o PDF.");
   }
