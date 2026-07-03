@@ -19,6 +19,63 @@ const btnRemoverImagem = document.getElementById("btn-remover-imagem");
 
 let editandoId = null;
 let imagemAtual = ""; // data URL (base64) da imagem selecionada
+let anexosCriar = []; // [{ nome, dados(base64) }] no formulario de cadastro
+let anexosEditar = []; // idem no modal de edicao
+
+// ---- Anexos PDF (compartilhado entre cadastro e edicao) ----
+function lerPdfBase64(arquivo) {
+  return new Promise((resolve, reject) => {
+    const r = new FileReader();
+    r.onerror = () => reject(new Error("Falha ao ler o arquivo."));
+    r.onload = () => resolve(r.result);
+    r.readAsDataURL(arquivo);
+  });
+}
+
+function renderAnexos(lista, container) {
+  container.innerHTML = lista
+    .map(
+      (a, i) =>
+        `<div class="anexo-item"><span class="anexo-nome">📄 ${escapar(a.nome)}</span><button type="button" class="anexo-remover" data-i="${i}" title="Remover">✕</button></div>`
+    )
+    .join("");
+  container.querySelectorAll(".anexo-remover").forEach((b) =>
+    b.addEventListener("click", () => {
+      lista.splice(Number(b.dataset.i), 1);
+      renderAnexos(lista, container);
+    })
+  );
+}
+
+async function adicionarPdfs(arquivos, lista, container) {
+  for (const f of arquivos) {
+    const ehPdf = f.type === "application/pdf" || f.name.toLowerCase().endsWith(".pdf");
+    if (!ehPdf) {
+      alert(`"${f.name}" nao e um PDF e foi ignorado.`);
+      continue;
+    }
+    try {
+      lista.push({ nome: f.name, dados: await lerPdfBase64(f) });
+    } catch {
+      alert(`Nao foi possivel ler "${f.name}".`);
+    }
+  }
+  renderAnexos(lista, container);
+}
+
+const anexoArquivoEl = document.getElementById("anexo-arquivo");
+const anexosListaEl = document.getElementById("anexos-lista");
+anexoArquivoEl.addEventListener("change", async () => {
+  await adicionarPdfs([...anexoArquivoEl.files], anexosCriar, anexosListaEl);
+  anexoArquivoEl.value = "";
+});
+
+const eAnexoArquivoEl = document.getElementById("e-anexo-arquivo");
+const eAnexosListaEl = document.getElementById("e-anexos-lista");
+eAnexoArquivoEl.addEventListener("change", async () => {
+  await adicionarPdfs([...eAnexoArquivoEl.files], anexosEditar, eAnexosListaEl);
+  eAnexoArquivoEl.value = "";
+});
 
 // ---- Menu lateral (hamburguer) e navegacao entre telas ----
 const btnMenu = document.getElementById("btn-menu");
@@ -215,6 +272,7 @@ formEditar.addEventListener("submit", async (e) => {
     login: document.getElementById("e-login").value,
     senha: document.getElementById("e-senha").value,
     imagem: imagemEdicao,
+    anexos: anexosEditar,
   };
   if (!dados.nome.trim()) return;
 
@@ -418,7 +476,16 @@ function abrirDetalhes(p) {
     ? `<div class="det-linha"><span class="det-rot">Imagem</span><img class="det-img" src="${escapar(p.imagem)}" alt="Imagem de ${escapar(p.nome)}" /></div>`
     : "";
 
-  detConteudo.innerHTML = linhas.join("") + img;
+  const anexos = Array.isArray(p.anexos) && p.anexos.length
+    ? `<div class="det-linha"><span class="det-rot">Documentos (PDF)</span><div class="det-anexos">${p.anexos
+        .map(
+          (a) =>
+            `<a class="det-anexo" href="${escapar(a.dados)}" download="${escapar(a.nome)}" target="_blank" rel="noopener">📄 ${escapar(a.nome)}</a>`
+        )
+        .join("")}</div></div>`
+    : "";
+
+  detConteudo.innerHTML = linhas.join("") + img + anexos;
 
   const btnVer = detConteudo.querySelector(".ver-senha");
   if (btnVer) {
@@ -456,6 +523,7 @@ form.addEventListener("submit", async (e) => {
     login: document.getElementById("login").value,
     senha: document.getElementById("senha").value,
     imagem: imagemAtual,
+    anexos: anexosCriar,
   };
   if (!dados.nome.trim()) {
     alert("Informe o produto.");
@@ -500,12 +568,16 @@ function iniciarEdicao(p) {
   document.getElementById("e-senha").value = p.senha || "";
   eImagemArquivo.value = "";
   mostrarPreviaEdicao(p.imagem || "");
+  anexosEditar = Array.isArray(p.anexos) ? p.anexos.map((a) => ({ ...a })) : [];
+  renderAnexos(anexosEditar, eAnexosListaEl);
   abrirModal();
 }
 
 function resetarForm() {
   form.reset();
   mostrarPrevia("");
+  anexosCriar = [];
+  renderAnexos(anexosCriar, anexosListaEl);
   editandoId = null;
   formTitulo.textContent = "Novo Produto";
   btnSalvar.textContent = "Adicionar";

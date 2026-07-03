@@ -6,8 +6,8 @@ import { pool, inicializarBanco, mapearProjeto } from "./db.js";
 const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const app = express();
-// Limite ampliado para acomodar imagens em base64
-app.use(express.json({ limit: "12mb" }));
+// Limite ampliado para acomodar imagens e PDFs em base64
+app.use(express.json({ limit: "30mb" }));
 app.use(
   express.static(join(__dirname, "public"), {
     etag: true,
@@ -27,6 +27,18 @@ function normalizarImagem(imagem) {
 // Aceita apenas os tipos validos; qualquer outro vira "painel"
 function normalizarTipo(tipo) {
   return String(tipo).trim().toLowerCase() === "ficha" ? "ficha" : "painel";
+}
+
+// Valida os anexos: mantem apenas PDFs (data URL) com nome, ate 10 arquivos
+function normalizarAnexos(anexos) {
+  if (!Array.isArray(anexos)) return [];
+  return anexos
+    .filter((a) => a && typeof a.dados === "string" && /^data:application\/pdf;base64,/.test(a.dados))
+    .slice(0, 10)
+    .map((a) => ({
+      nome: String(a.nome || "documento.pdf").trim().slice(0, 200),
+      dados: a.dados,
+    }));
 }
 
 // Mapeia a opcao de ordenacao para uma clausula ORDER BY segura (whitelist)
@@ -116,13 +128,14 @@ app.post("/api/projetos", async (req, res) => {
       login = "",
       senha = "",
       imagem = "",
+      anexos = [],
     } = req.body || {};
     if (!nome || !String(nome).trim()) {
       return res.status(400).json({ erro: "O nome do produto e obrigatorio." });
     }
     const { rows } = await pool.query(
-      `INSERT INTO projetos (nome, descricao, status, tipo, tema, programa, url, login, senha, imagem)
-       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10)
+      `INSERT INTO projetos (nome, descricao, status, tipo, tema, programa, url, login, senha, imagem, anexos)
+       VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
        RETURNING *`,
       [
         String(nome).trim(),
@@ -135,6 +148,7 @@ app.post("/api/projetos", async (req, res) => {
         String(login).trim(),
         String(senha),
         normalizarImagem(imagem),
+        JSON.stringify(normalizarAnexos(anexos)),
       ]
     );
     res.status(201).json(mapearProjeto(rows[0]));
@@ -193,7 +207,7 @@ app.post("/api/projetos/importar", async (req, res) => {
 // Atualizar
 app.put("/api/projetos/:id", async (req, res) => {
   try {
-    const { nome, descricao, status, tipo, url, tema, programa, login, senha, imagem } = req.body || {};
+    const { nome, descricao, status, tipo, url, tema, programa, login, senha, imagem, anexos } = req.body || {};
 
     // Monta atualizacao dinamica apenas com os campos enviados
     const campos = [];
@@ -213,6 +227,7 @@ app.put("/api/projetos/:id", async (req, res) => {
     if (login !== undefined) set("login", String(login).trim());
     if (senha !== undefined) set("senha", String(senha));
     if (imagem !== undefined) set("imagem", normalizarImagem(imagem));
+    if (anexos !== undefined) set("anexos", JSON.stringify(normalizarAnexos(anexos)));
 
     if (!campos.length) {
       return res.status(400).json({ erro: "Nenhum campo para atualizar." });

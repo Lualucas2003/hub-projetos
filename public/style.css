@@ -195,6 +195,28 @@ form input:focus, form textarea:focus, form select:focus {
 }
 .btn-pequeno { padding: 0.4rem 0.8rem; font-size: 0.82rem; }
 
+/* Anexos PDF no formulario */
+.anexos-lista { display: flex; flex-direction: column; gap: 0.35rem; margin-bottom: 0.85rem; }
+.anexo-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;
+  background: var(--realce); border: 1px solid var(--borda); border-radius: 8px;
+  padding: 0.4rem 0.6rem; font-size: 0.85rem;
+}
+.anexo-nome { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: var(--texto); }
+.anexo-remover {
+  background: none; border: none; cursor: pointer; color: var(--suave);
+  font-size: 0.9rem; line-height: 1; padding: 0.1rem 0.3rem;
+}
+.anexo-remover:hover { color: #e5484d; }
+
+/* Anexos no modal de detalhes */
+.det-anexos { display: flex; flex-direction: column; gap: 0.3rem; margin-top: 0.2rem; }
+.det-anexo {
+  display: inline-block; color: var(--acesso); text-decoration: none; font-weight: 600;
+  font-size: 0.9rem;
+}
+.det-anexo:hover { text-decoration: underline; }
+
 .btn {
   border: none;
   border-radius: 8px;

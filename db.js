@@ -30,6 +30,7 @@ export async function inicializarBanco() {
       login       TEXT NOT NULL DEFAULT '',
       senha       TEXT NOT NULL DEFAULT '',
       imagem      TEXT NOT NULL DEFAULT '',
+      anexos      JSONB NOT NULL DEFAULT '[]',
       criado_em   TIMESTAMPTZ NOT NULL DEFAULT now(),
       atualizado_em TIMESTAMPTZ NOT NULL DEFAULT now()
     );
@@ -40,6 +41,7 @@ export async function inicializarBanco() {
   await pool.query(`ALTER TABLE projetos ADD COLUMN IF NOT EXISTS login TEXT NOT NULL DEFAULT '';`);
   await pool.query(`ALTER TABLE projetos ADD COLUMN IF NOT EXISTS senha TEXT NOT NULL DEFAULT '';`);
   await pool.query(`ALTER TABLE projetos ADD COLUMN IF NOT EXISTS tipo TEXT NOT NULL DEFAULT 'painel';`);
+  await pool.query(`ALTER TABLE projetos ADD COLUMN IF NOT EXISTS anexos JSONB NOT NULL DEFAULT '[]';`);
 
   // Indices para acelerar filtros e ordenacao
   await pool.query(`CREATE INDEX IF NOT EXISTS idx_projetos_status ON projetos (status);`);
@@ -62,6 +64,7 @@ export function mapearProjeto(row) {
     login: row.login || "",
     senha: row.senha || "",
     imagem: row.imagem || "",
+    anexos: Array.isArray(row.anexos) ? row.anexos : [],
     criadoEm: row.criado_em instanceof Date ? row.criado_em.toISOString() : row.criado_em,
     atualizadoEm:
       row.atualizado_em instanceof Date ? row.atualizado_em.toISOString() : row.atualizado_em,
