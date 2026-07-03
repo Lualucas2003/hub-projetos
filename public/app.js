@@ -526,9 +526,37 @@ const pdfContainer = document.getElementById("pdf-container");
 const pdfTitulo = document.getElementById("pdf-titulo");
 const pdfBaixar = document.getElementById("pdf-baixar");
 let pdfRenderToken = 0; // cancela renderizacoes antigas
+let pdfDocAtual = null;
+let pdfEscala = 1.4;
 
 if (window.pdfjsLib) {
   pdfjsLib.GlobalWorkerOptions.workerSrc = "vendor/pdf.worker.min.js";
+}
+
+// Renderiza todas as paginas do PDF atual na escala atual
+async function renderPaginasPdf() {
+  if (!pdfDocAtual) return;
+  const token = ++pdfRenderToken;
+  pdfContainer.innerHTML = "";
+  // Nitidez em telas de alta densidade
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  for (let n = 1; n <= pdfDocAtual.numPages; n++) {
+    const page = await pdfDocAtual.getPage(n);
+    if (token !== pdfRenderToken) return;
+    const viewport = page.getViewport({ scale: pdfEscala });
+    const canvas = document.createElement("canvas");
+    canvas.className = "pdf-pagina";
+    canvas.width = Math.floor(viewport.width * dpr);
+    canvas.height = Math.floor(viewport.height * dpr);
+    canvas.style.width = viewport.width + "px";
+    canvas.style.height = viewport.height + "px";
+    pdfContainer.appendChild(canvas);
+    await page.render({
+      canvasContext: canvas.getContext("2d"),
+      viewport,
+      transform: dpr !== 1 ? [dpr, 0, 0, dpr, 0, 0] : undefined,
+    }).promise;
+  }
 }
 
 // Abre o PDF renderizando com PDF.js (canvas) - nao depende do visualizador do navegador,
@@ -548,19 +576,14 @@ async function abrirPdf(produto, indice = 0) {
   const token = ++pdfRenderToken;
   try {
     const pdf = await pdfjsLib.getDocument(url).promise;
-    if (token !== pdfRenderToken) return; // outro PDF foi aberto
-    pdfContainer.innerHTML = "";
-    for (let n = 1; n <= pdf.numPages; n++) {
-      const page = await pdf.getPage(n);
-      if (token !== pdfRenderToken) return;
-      const viewport = page.getViewport({ scale: 1.4 });
-      const canvas = document.createElement("canvas");
-      canvas.className = "pdf-pagina";
-      canvas.width = viewport.width;
-      canvas.height = viewport.height;
-      pdfContainer.appendChild(canvas);
-      await page.render({ canvasContext: canvas.getContext("2d"), viewport }).promise;
-    }
+    if (token !== pdfRenderToken) return;
+    pdfDocAtual = pdf;
+    // Escala inicial: preencher a largura disponivel do visualizador
+    const page1 = await pdf.getPage(1);
+    const base = page1.getViewport({ scale: 1 });
+    const largura = (pdfContainer.clientWidth || 900) - 32;
+    pdfEscala = Math.max(0.6, Math.min(3, largura / base.width));
+    await renderPaginasPdf();
   } catch (e) {
     if (token === pdfRenderToken) {
       pdfContainer.innerHTML = '<p class="pdf-status">Nao foi possivel exibir o PDF. Use "Baixar".</p>';
@@ -570,10 +593,20 @@ async function abrirPdf(produto, indice = 0) {
 
 function fecharPdf() {
   pdfRenderToken++; // cancela render em andamento
+  pdfDocAtual = null;
   modalPdf.hidden = true;
   pdfContainer.innerHTML = "";
   if (modalDetalhes.hidden) document.body.style.overflow = "";
 }
+
+document.getElementById("pdf-mais").addEventListener("click", () => {
+  pdfEscala = Math.min(4, pdfEscala + 0.25);
+  renderPaginasPdf();
+});
+document.getElementById("pdf-menos").addEventListener("click", () => {
+  pdfEscala = Math.max(0.4, pdfEscala - 0.25);
+  renderPaginasPdf();
+});
 document.getElementById("pdf-fechar").addEventListener("click", fecharPdf);
 modalPdf.querySelectorAll("[data-fechar-pdf]").forEach((el) => el.addEventListener("click", fecharPdf));
 
