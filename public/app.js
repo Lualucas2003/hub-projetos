@@ -347,11 +347,23 @@ function render(projetos) {
     card.className = `card ${ehFicha ? "ficha" : "painel"}`;
 
     const temPdf = Array.isArray(p.anexos) && p.anexos.length > 0;
-    const botaoAcessar = temPdf
-      ? `<button type="button" class="btn-acessar acessar-pdf">ACESSO</button>`
-      : p.url
-      ? `<a class="btn-acessar" href="${escapar(p.url)}" target="_blank" rel="noopener">ACESSO</a>`
-      : `<span class="sem-link">Sem acesso cadastrado</span>`;
+    const temLink = Boolean(p.url);
+    const temAmbos = temPdf && temLink;
+    // Com PDF e link, oferecemos os dois acessos; com apenas um, mantemos "ACESSO"
+    let botaoAcessar;
+    if (temAmbos) {
+      botaoAcessar =
+        `<div class="acessos-multi">` +
+        `<button type="button" class="btn-acessar acessar-pdf">PDF</button>` +
+        `<a class="btn-acessar acessar-link" href="${escapar(p.url)}" target="_blank" rel="noopener">LINK</a>` +
+        `</div>`;
+    } else if (temPdf) {
+      botaoAcessar = `<button type="button" class="btn-acessar acessar-pdf">ACESSO</button>`;
+    } else if (temLink) {
+      botaoAcessar = `<a class="btn-acessar" href="${escapar(p.url)}" target="_blank" rel="noopener">ACESSO</a>`;
+    } else {
+      botaoAcessar = `<span class="sem-link">Sem acesso cadastrado</span>`;
+    }
 
     card.innerHTML = `
       <span class="tipo-tag ${ehFicha ? "ficha" : "painel"}">${ehFicha ? "Ficha" : "Painel"}</span>

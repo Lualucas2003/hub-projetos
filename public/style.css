@@ -339,6 +339,11 @@ form input:focus, form textarea:focus, form select:focus {
 }
 .btn-acessar:hover { filter: brightness(1.15); }
 
+/* Produto com PDF e link: dois acessos lado a lado */
+.acessos-multi { margin-top: auto; width: 100%; display: flex; gap: 0.5rem; }
+.acessos-multi .btn-acessar { margin-top: 0; flex: 1; }
+.cards.modo-lista .acessos-multi { margin-top: 0; width: auto; order: 2; }
+
 /* Acoes (editar / excluir) - canto superior direito */
 .card-acoes { position: absolute; top: 0.6rem; right: 0.6rem; display: flex; gap: 0.3rem; }
 .acao {
